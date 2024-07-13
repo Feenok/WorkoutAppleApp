@@ -18,6 +18,7 @@
 		E9C9C5142C40DE67003B1119 /* FilteredExerciseList.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9C9C5132C40DE67003B1119 /* FilteredExerciseList.swift */; };
 		E9C9C5162C42024E003B1119 /* ExerciseDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9C9C5152C42024E003B1119 /* ExerciseDetails.swift */; };
 		E9C9C5182C4226E8003B1119 /* AddExerciseSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9C9C5172C4226E7003B1119 /* AddExerciseSet.swift */; };
+		E9C9C51E2C42EF19003B1119 /* ExerciseDetailsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9C9C51D2C42EF19003B1119 /* ExerciseDetailsViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -33,6 +34,7 @@
 		E9C9C5132C40DE67003B1119 /* FilteredExerciseList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilteredExerciseList.swift; sourceTree = "<group>"; };
 		E9C9C5152C42024E003B1119 /* ExerciseDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseDetails.swift; sourceTree = "<group>"; };
 		E9C9C5172C4226E7003B1119 /* AddExerciseSet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddExerciseSet.swift; sourceTree = "<group>"; };
+		E9C9C51D2C42EF19003B1119 /* ExerciseDetailsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseDetailsViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -65,6 +67,7 @@
 		E9C9C4F82C40D1F2003B1119 /* WorkoutsApp */ = {
 			isa = PBXGroup;
 			children = (
+				E9C9C51C2C42EF04003B1119 /* ViewModels */,
 				E9C9C5122C40DDF8003B1119 /* Views */,
 				E9C9C5112C40DDA1003B1119 /* Models */,
 				E9C9C4F92C40D1F2003B1119 /* WorkoutsAppApp.swift */,
@@ -102,6 +105,14 @@
 				E9C9C5172C4226E7003B1119 /* AddExerciseSet.swift */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		E9C9C51C2C42EF04003B1119 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				E9C9C51D2C42EF19003B1119 /* ExerciseDetailsViewModel.swift */,
+			);
+			path = ViewModels;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -183,6 +194,7 @@
 				E9C9C4FE2C40D1F2003B1119 /* Exercise.swift in Sources */,
 				E9C9C50C2C40DB09003B1119 /* ExerciseSet.swift in Sources */,
 				E9C9C4FA2C40D1F2003B1119 /* WorkoutsAppApp.swift in Sources */,
+				E9C9C51E2C42EF19003B1119 /* ExerciseDetailsViewModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

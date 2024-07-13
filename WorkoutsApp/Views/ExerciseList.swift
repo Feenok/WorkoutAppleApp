@@ -61,7 +61,6 @@ struct ExerciseList: View {
     }
 
     private func addExercise() {
-        
         withAnimation {
             let newItem = Exercise(name: "", category: "")
             modelContext.insert(newItem)

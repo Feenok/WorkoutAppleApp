@@ -8,53 +8,66 @@
 import SwiftUI
 
 struct ExerciseDetails: View {
-    
-    @Bindable var exercise: Exercise
-    
-    @State var newExerciseSet: ExerciseSet?
+    @StateObject private var vm: ExerciseDetailsViewModel
     
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
     
     init(exercise: Exercise) {
-        self.exercise = exercise
+        _vm = StateObject(wrappedValue: ExerciseDetailsViewModel(exercise: exercise))
     }
     
     var body: some View {
-        
-        Form {
-            Text(exercise.name)
-        }
-        .navigationTitle("")
-        .toolbar{
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Done") {
-                        dismiss()
+        Group {
+            VStack {
+                if vm.highestWeightSet != nil {
+                    Text("Personal Best").fontWeight(.bold)
+                    Text("On: \(vm.highestWeightSet!.date, style: .date)")
+                    Text("Weight: \(vm.highestWeightSet!.weight) lbs")
+                    Text("For: \(vm.highestWeightSet!.reps) reps")
+                    Spacer()
+                }
+                if !vm.exercise.exerciseSets.isEmpty {
+                    List {
+                        ForEach(vm.exercise.exerciseSets) { exerciseSet in
+                            VStack(alignment: .leading) {
+                                Text("\(exerciseSet.date)").fontWeight(.bold)
+                                Text("Weight:  \(exerciseSet.weight)")
+                                Text("Reps:  \(exerciseSet.reps)")
+                            }
+                        }
+                    }
+                } else {
+                    ContentUnavailableView {
+                        Label("Add set", systemImage: "film.stack")
                     }
                 }
-            ToolbarItem {
-                Button(action: addExerciseSet) {
-                    Label("Add Item", systemImage: "plus")
+            }
+        }
+        .navigationTitle(vm.exercise.name)
+        .toolbar{
+            ToolbarItem(placement: .confirmationAction) {
+                Button("Done") {
+                    dismiss()
                 }
             }
-            
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button(action: {
+                    vm.addExerciseSet()
+                }) {
+                    Label("Add Exercise", systemImage: "plus")
+                }
+            }
         }
-        .sheet(item: $newExerciseSet) { exerciseSet in
+        .sheet(item: $vm.newExerciseSet) { exerciseSet in
             NavigationStack {
-                AddExerciseSet(exerciseSet: exerciseSet)
+                AddExerciseSet(exercise: vm.exercise, exerciseSet: exerciseSet)
             }
             .interactiveDismissDisabled()
+            .onDisappear {
+                vm.updateHighestWeightSet()
+            }
         }
     }
-    
-    private func addExerciseSet() {
-        var todaysDate: Date = Date()
-        withAnimation {
-            let newItem = ExerciseSet(exercise: exercise, weight: 0, reps: 0, date: todaysDate)
-            modelContext.insert(newItem)
-            newExerciseSet = newItem
-        }
-    }
-    
 }
 

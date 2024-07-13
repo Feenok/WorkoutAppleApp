@@ -8,13 +8,14 @@
 import SwiftUI
 
 struct AddExerciseSet: View {
-    
+    @Bindable var exercise: Exercise
     @Bindable var exerciseSet: ExerciseSet
     
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
     
-    init(exerciseSet: ExerciseSet) {
+    init(exercise: Exercise, exerciseSet: ExerciseSet) {
+        self.exercise = exercise
         self.exerciseSet = exerciseSet
     }
     
@@ -24,11 +25,17 @@ struct AddExerciseSet: View {
             Text(exerciseSet.exercise.name)
             
             DatePicker("Date", selection: $exerciseSet.date, displayedComponents: .date)
+            TextField("Weight", value: $exerciseSet.weight, formatter: NumberFormatter())
+                            .keyboardType(.numberPad)
+            TextField("Reps", value: $exerciseSet.reps, formatter: NumberFormatter())
+                            .keyboardType(.numberPad)
+            
         }
         .navigationTitle("")
         .toolbar{
             ToolbarItem(placement: .confirmationAction) {
                 Button("Done") {
+                    exercise.exerciseSets.append(exerciseSet)
                     dismiss()
                 }
             }
