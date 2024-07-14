@@ -27,6 +27,7 @@ struct ExerciseDetails: View {
                     Text("For: \(vm.highestWeightSet!.reps) reps")
                     Spacer()
                 }
+                ExerciseChartView(exerciseSets: vm.exercise.exerciseSets)
                 if !vm.exercise.exerciseSets.isEmpty {
                     List {
                         ForEach(vm.exercise.exerciseSets) { exerciseSet in

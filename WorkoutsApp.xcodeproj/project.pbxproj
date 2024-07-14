@@ -19,6 +19,7 @@
 		E9C9C5162C42024E003B1119 /* ExerciseDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9C9C5152C42024E003B1119 /* ExerciseDetails.swift */; };
 		E9C9C5182C4226E8003B1119 /* AddExerciseSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9C9C5172C4226E7003B1119 /* AddExerciseSet.swift */; };
 		E9C9C51E2C42EF19003B1119 /* ExerciseDetailsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9C9C51D2C42EF19003B1119 /* ExerciseDetailsViewModel.swift */; };
+		E9D3A9632C44780000C46DE0 /* ExerciseChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9D3A9622C44780000C46DE0 /* ExerciseChartView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -35,6 +36,7 @@
 		E9C9C5152C42024E003B1119 /* ExerciseDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseDetails.swift; sourceTree = "<group>"; };
 		E9C9C5172C4226E7003B1119 /* AddExerciseSet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddExerciseSet.swift; sourceTree = "<group>"; };
 		E9C9C51D2C42EF19003B1119 /* ExerciseDetailsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseDetailsViewModel.swift; sourceTree = "<group>"; };
+		E9D3A9622C44780000C46DE0 /* ExerciseChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseChartView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -103,6 +105,7 @@
 				E9C9C5132C40DE67003B1119 /* FilteredExerciseList.swift */,
 				E9C9C5152C42024E003B1119 /* ExerciseDetails.swift */,
 				E9C9C5172C4226E7003B1119 /* AddExerciseSet.swift */,
+				E9D3A9622C44780000C46DE0 /* ExerciseChartView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -186,6 +189,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E9C9C5162C42024E003B1119 /* ExerciseDetails.swift in Sources */,
+				E9D3A9632C44780000C46DE0 /* ExerciseChartView.swift in Sources */,
 				E9C9C50A2C40D743003B1119 /* EnterExercise.swift in Sources */,
 				E9C9C4FC2C40D1F2003B1119 /* ExerciseList.swift in Sources */,
 				E9C9C5182C4226E8003B1119 /* AddExerciseSet.swift in Sources */,

@@ -9,8 +9,9 @@ import Foundation
 import SwiftData
 
 @Model
-final class ExerciseSet {
+final class ExerciseSet: Identifiable {
     // An exercise with its weights, and reps info
+    var id = UUID()
     var exercise: Exercise
     var weight: Int
     var reps: Int
