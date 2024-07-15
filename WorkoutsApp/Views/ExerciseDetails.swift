@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ExerciseDetails: View {
     @StateObject private var vm: ExerciseDetailsViewModel
+    @State var selectedDate: Date? = nil
     
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
@@ -18,30 +19,42 @@ struct ExerciseDetails: View {
     }
     
     var body: some View {
-        Group {
-            VStack {
-                if vm.highestWeightSet != nil {
-                    Text("Personal Best").fontWeight(.bold)
-                    Text("On: \(vm.highestWeightSet!.date, style: .date)")
-                    Text("Weight: \(vm.highestWeightSet!.weight) lbs")
-                    Text("For: \(vm.highestWeightSet!.reps) reps")
-                    Spacer()
-                }
-                ExerciseChartView(exerciseSets: vm.exercise.exerciseSets)
-                if !vm.exercise.exerciseSets.isEmpty {
-                    List {
-                        ForEach(vm.exercise.exerciseSets) { exerciseSet in
-                            VStack(alignment: .leading) {
-                                Text("\(exerciseSet.date)").fontWeight(.bold)
-                                Text("Weight:  \(exerciseSet.weight)")
-                                Text("Reps:  \(exerciseSet.reps)")
+        VStack {
+            if !vm.exercise.exerciseSets.isEmpty {
+                
+                    VStack {
+                        
+                        Group {
+                            if vm.highestWeightSet != nil {
+                                Text("Personal Best").fontWeight(.bold)
+                                Text("On: \(vm.highestWeightSet!.date, style: .date)")
+                                Text("Weight: \(vm.highestWeightSet!.weight) lbs")
+                                Text("For: \(vm.highestWeightSet!.reps) reps")
                             }
                         }
+                        //.opacity(selectedDate == nil ? 1.0 : 0.0)
+                        
+                        
+                        
+                        ExerciseChartView(exerciseSets: vm.exercise.exerciseSets, selectedDate: $selectedDate)
+                        
+                        
+                        List {
+                            ForEach(vm.exercise.exerciseSets) { exerciseSet in
+                                VStack(alignment: .leading) {
+                                    Text("\(exerciseSet.date)").fontWeight(.bold)
+                                    Text("Weight:  \(exerciseSet.weight)")
+                                    Text("Reps:  \(exerciseSet.reps)")
+                                }
+                            }
+                        }
+                        
                     }
-                } else {
-                    ContentUnavailableView {
-                        Label("Add set", systemImage: "film.stack")
-                    }
+                
+            }
+            else {
+                ContentUnavailableView {
+                    Label("Add set", systemImage: "film.stack")
                 }
             }
         }
