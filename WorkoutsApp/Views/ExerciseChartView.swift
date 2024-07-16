@@ -68,8 +68,8 @@ struct ExerciseChartView: View {
         .chartXSelection(value: $selectedDate)
         .padding(8)
         .chartScrollableAxes(.horizontal)
-        .chartXVisibleDomain(length: 3600 * 24 * 30)
-        .chartScrollPosition(initialX: Calendar.current.date(byAdding: .day, value: -28, to: Date()) ?? Date())
+        .chartXVisibleDomain(length: 3600 * 24 * 21)
+        .chartScrollPosition(initialX: Calendar.current.date(byAdding: .day, value: -19, to: Date()) ?? Date())
         .chartScrollTargetBehavior(
             .valueAligned(
                 matching: DateComponents(hour: 0),
@@ -92,12 +92,21 @@ struct ExerciseChartView: View {
     
     @ViewBuilder
     var valueSelectionPopover: some View {
+        let padding: CGFloat = -4
         if let details = selectedDateDetails, let date = selectedDate {
             VStack(alignment: .leading) {
-                Text("Details for \(date, format: .dateTime.month().day())")
-                    .font(.headline)
-                Text("Weight: \(details.weight) lbs")
-                Text("Reps: \(details.reps)")
+                Text("MAX WEIGHT").foregroundStyle(.gray).padding(.vertical, padding).font(.caption).fontWeight(.semibold)
+                HStack{
+                    HStack(alignment: .bottom) {
+                        Text("\(details.weight)").font(.title3).padding(.vertical, padding).padding(.trailing, padding).fontWeight(.semibold)
+                        Text("LBS").foregroundStyle(.gray).padding(.vertical, padding).padding(.bottom, 2).font(.caption).fontWeight(.semibold)
+                    }
+                    HStack(alignment: .bottom) {
+                        Text("\(details.reps)").font(.title3).padding(.vertical, padding).padding(.trailing, padding).fontWeight(.semibold)
+                        Text("REPS").foregroundStyle(.gray).padding(.vertical, padding).padding(.bottom, 2).font(.caption).fontWeight(.semibold)
+                    }
+                }
+                Text("\(date, format: .dateTime.year().month().day())").foregroundStyle(.gray).padding(.vertical, padding).font(.caption).fontWeight(.semibold)
             }
             .padding(6)
             .background {
@@ -105,12 +114,17 @@ struct ExerciseChartView: View {
                 .foregroundStyle(Color.gray.opacity(0.12))
             }
         } else {
-            Text("No data available")
+            if let date = selectedDate {
+                VStack {
+                    Text("\(date, format: .dateTime.year().month().day())")
+                    Text("No data available")
+                }
                 .padding(6)
                 .background {
                     RoundedRectangle(cornerRadius: 4)
-                    .foregroundStyle(Color.gray.opacity(0.12))
+                        .foregroundStyle(Color.gray.opacity(0.12))
                 }
+            }
         }
     }
     

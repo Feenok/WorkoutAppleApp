@@ -12,6 +12,13 @@ import SwiftUI
 class ExerciseDetailsViewModel: ObservableObject {
     @Published var exercise: Exercise
     @Published var highestWeightSet: ExerciseSet?
+    @Published var latestExerciseSet: ExerciseSet?{
+            didSet {
+                if let _ = newExerciseSet {
+                    updateLatestSet()
+                }
+            }
+        }
     @Published var newExerciseSet: ExerciseSet? {
             didSet {
                 if let _ = newExerciseSet {
@@ -34,5 +41,10 @@ class ExerciseDetailsViewModel: ObservableObject {
         exercise.exerciseSets.append(newItem)
         newExerciseSet = newItem
         updateHighestWeightSet()
+        updateLatestSet()
+    }
+    
+    func updateLatestSet() {
+        latestExerciseSet = exercise.exerciseSets.last
     }
 }
