@@ -50,6 +50,13 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		E9AA5CB42C474DA100805A71 /* Data */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Data;
+			sourceTree = "<group>";
+		};
 		E9C9C4ED2C40D1F1003B1119 = {
 			isa = PBXGroup;
 			children = (
@@ -69,6 +76,7 @@
 		E9C9C4F82C40D1F2003B1119 /* WorkoutsApp */ = {
 			isa = PBXGroup;
 			children = (
+				E9AA5CB42C474DA100805A71 /* Data */,
 				E9C9C51C2C42EF04003B1119 /* ViewModels */,
 				E9C9C5122C40DDF8003B1119 /* Views */,
 				E9C9C5112C40DDA1003B1119 /* Models */,
@@ -134,6 +142,8 @@
 			dependencies = (
 			);
 			name = WorkoutsApp;
+			packageProductDependencies = (
+			);
 			productName = WorkoutsApp;
 			productReference = E9C9C4F62C40D1F2003B1119 /* WorkoutsApp.app */;
 			productType = "com.apple.product-type.application";
@@ -162,6 +172,8 @@
 				Base,
 			);
 			mainGroup = E9C9C4ED2C40D1F1003B1119;
+			packageReferences = (
+			);
 			productRefGroup = E9C9C4F72C40D1F2003B1119 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";

@@ -12,12 +12,14 @@ import SwiftData
 final class Exercise {
     var name: String
     var category: String
-    
-    var exerciseSets: [ExerciseSet] = []
+    var PRSet: ExerciseSet? //Personal Record Set
+    @Relationship(deleteRule: .cascade) var allSets: [ExerciseSet] = []
     
     init(name: String, category: String) {
-        self.name = name
-        self.category = category
-    }
+            self.name = name
+            self.category = category
+        }
     
 }
+
+

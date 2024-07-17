@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct ExerciseDetails: View {
     @StateObject private var vm: ExerciseDetailsViewModel
@@ -14,75 +15,38 @@ struct ExerciseDetails: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
     
+    // New exercise info to be added
+    @State var newSetDate: Date = Date.now
+    @State var newSetWeight: String?
+    @State var newSetReps: String?
+    
+    var defaultSet = ExerciseSet(weight: 0, reps: 0)
+    
     init(exercise: Exercise) {
         _vm = StateObject(wrappedValue: ExerciseDetailsViewModel(exercise: exercise))
     }
     
     var body: some View {
         VStack {
-            if !vm.exercise.exerciseSets.isEmpty {
+            if !vm.exercise.allSets.isEmpty {
                 
                 VStack {
                     let padding: CGFloat = -4
-                    ExerciseSetView(exerciseSet: vm.highestWeightSet!, setType: .greatest)
-                    /*
-                    VStack {
-                        if vm.highestWeightSet != nil {
-                            Text("PERSONAL BEST")
-                                .foregroundStyle(.gray)
-                                .fontWeight(.semibold)
-                                .padding(.vertical, padding)
-                            HStack {
-                                Text("\(vm.highestWeightSet!.weight)")
-                                    .fontWeight(.bold)
-                                    .font(.callout)
-                                    .padding(.vertical, padding)
-                                Text("LBS")
-                                    .foregroundStyle(.gray)
-                                    .padding(.vertical, padding)
-                            }
-                            HStack {
-                                Text("\(vm.highestWeightSet!.reps)")
-                                    .fontWeight(.bold)
-                                    .padding(.vertical, padding)
-                                Text("REPS")
-                                    .foregroundStyle(.gray)
-                                    .padding(.vertical, padding)
-                            }
-                            Text("\(vm.highestWeightSet!.date, format: .dateTime.year().month().day())")
-                                .foregroundStyle(.gray)
-                                .padding(.vertical, padding)
-                        }
-                    }
-                 */
+                    ExerciseSetView(exerciseSet: vm.exercise.PRSet ?? defaultSet, setType: .greatest)
                     //.opacity(selectedDate == nil ? 1.0 : 0.0)
                     Group {
-                        ExerciseChartView(exerciseSets: vm.exercise.exerciseSets, selectedDate: $selectedDate)
+                        ExerciseChartView(exerciseSets: vm.exercise.allSets, selectedDate: $selectedDate)
                     }
+                    .frame(height: 300)
                     .padding(.horizontal, 8)
-                    
-                    if vm.latestExerciseSet != nil {
-                        ExerciseSetView(exerciseSet: vm.latestExerciseSet!, setType: .latest)
-                    }
-                    
-                    /*
-                     List {
-                     ForEach(vm.exercise.exerciseSets) { exerciseSet in
-                     VStack(alignment: .leading) {
-                     Text("\(exerciseSet.date)").fontWeight(.bold)
-                     Text("Weight:  \(exerciseSet.weight)")
-                     Text("Reps:  \(exerciseSet.reps)")
-                     }
-                     }
-                     }
-                     */
-                    
+                    ExerciseSetView(exerciseSet: vm.exercise.allSets.last ?? defaultSet, setType: .latest)
+                    Spacer()
                 }
                 
             }
             else {
                 ContentUnavailableView {
-                    Label("Add set", systemImage: "film.stack")
+                    Label("Add Exercise Set", systemImage: "film.stack")
                 }
             }
         }
@@ -93,6 +57,7 @@ struct ExerciseDetails: View {
                     dismiss()
                 }
             }
+            /*
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: {
                     vm.addExerciseSet()
@@ -100,15 +65,68 @@ struct ExerciseDetails: View {
                     Label("Add Exercise", systemImage: "plus")
                 }
             }
+             */
         }
+        /*
         .sheet(item: $vm.newExerciseSet) { exerciseSet in
             NavigationStack {
                 AddExerciseSet(exercise: vm.exercise, exerciseSet: exerciseSet)
             }
             .interactiveDismissDisabled()
             .onDisappear {
-                vm.updateHighestWeightSet()
+                vm.updateHighestWeightSet(newSet: exerciseSet)
             }
+        }
+         */
+        .safeAreaInset(edge: .bottom) {
+            var today = Date.now
+            VStack(alignment: .center, spacing: 20) {
+                ZStack {
+                    Text("Add New Set")
+                        .font(.headline)
+                    HStack {
+                        Spacer()
+                        Button("Save") {
+                            if let weight = Int(newSetWeight ?? ""),
+                               let reps = Int(newSetReps ?? "") {
+                                let newSet = ExerciseSet(weight: weight, reps: reps, date: newSetDate)
+                                vm.addSet(newSet: newSet)
+                                
+                                newSetWeight = nil
+                                newSetReps = nil
+                                newSetDate = Date.now
+                            }
+                        }
+                        .bold()
+                        .disabled(newSetWeight?.isEmpty ?? true || newSetReps?.isEmpty ?? true)
+                        .opacity(!(newSetWeight?.isEmpty ?? true) && !(newSetReps?.isEmpty ?? true) ? 1.0 : 0.5)
+                    }
+                }
+                DatePicker(selection: $newSetDate, in: ...today, displayedComponents: .date) {
+                    HStack {
+                        TextField("Weight", text: Binding(
+                            get: { self.newSetWeight ?? "" },
+                            set: { self.newSetWeight = $0.isEmpty ? nil : $0 }
+                        ))
+                        .textFieldStyle(.roundedBorder)
+                        .keyboardType(.numberPad)
+                        .onChange(of: newSetWeight) { _, newValue in
+                            newSetWeight = newValue?.filter { "0123456789".contains($0) }
+                        }
+                        TextField("Reps", text: Binding(
+                            get: { self.newSetReps ?? "" },
+                            set: { self.newSetReps = $0.isEmpty ? nil : $0 }
+                        ))
+                        .textFieldStyle(.roundedBorder)
+                        .keyboardType(.numberPad)
+                        .onChange(of: newSetReps) { _, newValue in
+                            newSetReps = newValue?.filter { "0123456789".contains($0) }
+                        }
+                    }
+                }
+            }
+            .padding()
+            .background(.bar)
         }
     }
 }

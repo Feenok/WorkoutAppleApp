@@ -6,28 +6,30 @@
 //
 
 import SwiftUI
-
+/*
 struct AddExerciseSet: View {
     @Bindable var exercise: Exercise
-    @Bindable var exerciseSet: ExerciseSet
+    @Bindable var newExerciseSet: ExerciseSet
     
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
     
+    let today = Date()
+    
     init(exercise: Exercise, exerciseSet: ExerciseSet) {
         self.exercise = exercise
-        self.exerciseSet = exerciseSet
+        self.newExerciseSet = exerciseSet
     }
     
     var body: some View {
         
         Form {
-            Text(exerciseSet.exercise.name)
+            Text(newExerciseSet.exercise.name)
             
-            DatePicker("Date", selection: $exerciseSet.date, displayedComponents: .date)
-            TextField("Weight", value: $exerciseSet.weight, formatter: NumberFormatter())
+            DatePicker("Date", selection: $newExerciseSet.date, in: ...today, displayedComponents: .date)
+            TextField("Weight", value: $newExerciseSet.weight, formatter: NumberFormatter())
                             .keyboardType(.numberPad)
-            TextField("Reps", value: $exerciseSet.reps, formatter: NumberFormatter())
+            TextField("Reps", value: $newExerciseSet.reps, formatter: NumberFormatter())
                             .keyboardType(.numberPad)
             
         }
@@ -35,16 +37,17 @@ struct AddExerciseSet: View {
         .toolbar{
             ToolbarItem(placement: .confirmationAction) {
                 Button("Done") {
-                    exercise.exerciseSets.append(exerciseSet)
+                    exercise.exerciseSets.append(newExerciseSet)
                     dismiss()
                 }
             }
             ToolbarItem(placement: .cancellationAction) {
                 Button("Cancel") {
-                    modelContext.delete(exerciseSet)
+                    modelContext.delete(newExerciseSet)
                     dismiss()
                 }
             }
         }
     }
 }
+*/

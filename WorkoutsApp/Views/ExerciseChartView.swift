@@ -46,6 +46,7 @@ struct ExerciseChartView: View {
                 )
             }
             .foregroundStyle(.blue)
+            .interpolationMethod(.catmullRom)
             
             if let selectedDate {
                 RuleMark(
@@ -58,7 +59,7 @@ struct ExerciseChartView: View {
                     position: .top, spacing: 0,
                     overflowResolution: .init(
                         x: .fit(to: .chart),
-                        y: .fit(to: .chart)
+                        y: .disabled
                     )
                 ) {
                     valueSelectionPopover
@@ -116,8 +117,8 @@ struct ExerciseChartView: View {
         } else {
             if let date = selectedDate {
                 VStack {
-                    Text("\(date, format: .dateTime.year().month().day())")
-                    Text("No data available")
+                    Text("\(date, format: .dateTime.year().month().day())").foregroundStyle(.gray).padding(.vertical, padding).font(.caption).fontWeight(.semibold)
+                    Text("No data available").foregroundStyle(.gray).padding(.vertical, padding).font(.caption).fontWeight(.semibold)
                 }
                 .padding(6)
                 .background {
