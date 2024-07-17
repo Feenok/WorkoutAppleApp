@@ -20,6 +20,8 @@ struct ExerciseDetails: View {
     @State var newSetWeight: String?
     @State var newSetReps: String?
     
+    @State private var insetExpanded = false // Check if inset for adding a set is expanded
+    
     var defaultSet = ExerciseSet(weight: 0, reps: 0)
     
     init(exercise: Exercise) {
@@ -57,76 +59,83 @@ struct ExerciseDetails: View {
                     dismiss()
                 }
             }
-            /*
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: {
-                    vm.addExerciseSet()
+                    withAnimation {
+                        insetExpanded.toggle()
+                    }
                 }) {
-                    Label("Add Exercise", systemImage: "plus")
+                    if !insetExpanded {
+                        Label("Open adding set inset", systemImage: "plus")
+                    } else {
+                        Label("Close adding set inset", systemImage: "plus")
+                            .foregroundStyle(.gray)
+                            .opacity(0.5)
+                    }
                 }
             }
-             */
+             
         }
-        /*
-        .sheet(item: $vm.newExerciseSet) { exerciseSet in
-            NavigationStack {
-                AddExerciseSet(exercise: vm.exercise, exerciseSet: exerciseSet)
-            }
-            .interactiveDismissDisabled()
-            .onDisappear {
-                vm.updateHighestWeightSet(newSet: exerciseSet)
-            }
-        }
-         */
         .safeAreaInset(edge: .bottom) {
-            var today = Date.now
-            VStack(alignment: .center, spacing: 20) {
-                ZStack {
-                    Text("Add New Set")
-                        .font(.headline)
-                    HStack {
-                        Spacer()
-                        Button("Save") {
-                            if let weight = Int(newSetWeight ?? ""),
-                               let reps = Int(newSetReps ?? "") {
-                                let newSet = ExerciseSet(weight: weight, reps: reps, date: newSetDate)
-                                vm.addSet(newSet: newSet)
-                                
-                                newSetWeight = nil
-                                newSetReps = nil
-                                newSetDate = Date.now
+            if insetExpanded {
+                var today = Date.now
+                VStack(alignment: .center, spacing: 20) {
+                    ZStack {
+                        Text("Add New Set")
+                            .font(.headline)
+                        HStack {
+                            Spacer()
+                            Button("Save") {
+                                if let weight = Int(newSetWeight ?? ""),
+                                   let reps = Int(newSetReps ?? "") {
+                                    let newSet = ExerciseSet(weight: weight, reps: reps, date: newSetDate)
+                                    vm.addSet(newSet: newSet)
+                                    
+                                    newSetWeight = nil
+                                    newSetReps = nil
+                                    newSetDate = Date.now
+                                }
+                            }
+                            .bold()
+                            .disabled(newSetWeight?.isEmpty ?? true || newSetReps?.isEmpty ?? true)
+                            .opacity(!(newSetWeight?.isEmpty ?? true) && !(newSetReps?.isEmpty ?? true) ? 1.0 : 0.5)
+                        }
+                        HStack {
+                            Button("Cancel") {
+                                withAnimation {
+                                    insetExpanded.toggle()
+                                }
+                            }
+                            .foregroundStyle(.red)
+                            Spacer()
+                        }
+                    }
+                    DatePicker(selection: $newSetDate, in: ...today, displayedComponents: .date) {
+                        HStack {
+                            TextField("Weight", text: Binding(
+                                get: { self.newSetWeight ?? "" },
+                                set: { self.newSetWeight = $0.isEmpty ? nil : $0 }
+                            ))
+                            .textFieldStyle(.roundedBorder)
+                            .keyboardType(.numberPad)
+                            .onChange(of: newSetWeight) { _, newValue in
+                                newSetWeight = newValue?.filter { "0123456789".contains($0) }
+                            }
+                            TextField("Reps", text: Binding(
+                                get: { self.newSetReps ?? "" },
+                                set: { self.newSetReps = $0.isEmpty ? nil : $0 }
+                            ))
+                            .textFieldStyle(.roundedBorder)
+                            .keyboardType(.numberPad)
+                            .onChange(of: newSetReps) { _, newValue in
+                                newSetReps = newValue?.filter { "0123456789".contains($0) }
                             }
                         }
-                        .bold()
-                        .disabled(newSetWeight?.isEmpty ?? true || newSetReps?.isEmpty ?? true)
-                        .opacity(!(newSetWeight?.isEmpty ?? true) && !(newSetReps?.isEmpty ?? true) ? 1.0 : 0.5)
                     }
                 }
-                DatePicker(selection: $newSetDate, in: ...today, displayedComponents: .date) {
-                    HStack {
-                        TextField("Weight", text: Binding(
-                            get: { self.newSetWeight ?? "" },
-                            set: { self.newSetWeight = $0.isEmpty ? nil : $0 }
-                        ))
-                        .textFieldStyle(.roundedBorder)
-                        .keyboardType(.numberPad)
-                        .onChange(of: newSetWeight) { _, newValue in
-                            newSetWeight = newValue?.filter { "0123456789".contains($0) }
-                        }
-                        TextField("Reps", text: Binding(
-                            get: { self.newSetReps ?? "" },
-                            set: { self.newSetReps = $0.isEmpty ? nil : $0 }
-                        ))
-                        .textFieldStyle(.roundedBorder)
-                        .keyboardType(.numberPad)
-                        .onChange(of: newSetReps) { _, newValue in
-                            newSetReps = newValue?.filter { "0123456789".contains($0) }
-                        }
-                    }
-                }
+                .padding()
+                .background(.bar)
             }
-            .padding()
-            .background(.bar)
         }
     }
 }
