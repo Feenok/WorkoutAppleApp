@@ -10,7 +10,7 @@ import SwiftUI
 
 struct ExerciseChartView: View {
     
-    var exerciseSets: [ExerciseSet]
+    var sets: [Date:[ExerciseSet]]
     @Environment(\.calendar) var calendar
     @Binding var selectedDate: Date?
     
@@ -18,35 +18,27 @@ struct ExerciseChartView: View {
         calendar.date(byAdding: .day, value: 1, to: date)!
     }
     
-    var selectedDateDetails: (weight: Int, reps: Int)? {
-        guard let rawSelectedDate = selectedDate else { return nil }
-        let endOfDay = calendar.date(byAdding: .day, value: 1, to: rawSelectedDate)!
-        
-        // Finding the highest weight on the selected date
-        let daySets = exerciseSets.filter {
-            $0.date >= rawSelectedDate && $0.date < endOfDay
-        }
-        print("Total exercise sets: \(exerciseSets.count)")
-        print("Selected date: \(rawSelectedDate), Matching sets: \(daySets.count)")
-        
-        if let maxSet = daySets.max(by: { $0.weight < $1.weight }) {
-            print("Max weight on day: \(maxSet.weight)")
-            return (maxSet.weight, maxSet.reps)
+    var selectedDateMaxWeightDetails: (weight: Int, reps: Int)? {
+        guard let selectedDate = selectedDate,
+              let setsForDate = sets[selectedDate] else {
+            return nil
         }
         
-        return nil
+        return setsForDate.max(by: { $0.weight < $1.weight })
+            .map { ($0.weight, $0.reps) }
     }
     
     var body: some View {
         Chart {
-            ForEach(exerciseSets) { set in
-                BarMark(
-                    x: .value("Date", set.date, unit: .day),
-                    y: .value("Weight", set.weight)
-                )
+            ForEach(Array(sets.keys), id: \.self) { date in
+                if let maxSet = sets[date]?.max(by: { $0.weight < $1.weight }) {
+                    BarMark(
+                        x: .value("Date", date, unit: .day),
+                        y: .value("Weight", maxSet.weight)
+                    )
+                }
             }
             .foregroundStyle(.blue)
-            .interpolationMethod(.catmullRom)
             
             if let selectedDate {
                 RuleMark(
@@ -59,7 +51,7 @@ struct ExerciseChartView: View {
                     position: .top, spacing: 0,
                     overflowResolution: .init(
                         x: .fit(to: .chart),
-                        y: .disabled
+                        y: .fit(to: .chart)
                     )
                 ) {
                     valueSelectionPopover
@@ -90,11 +82,10 @@ struct ExerciseChartView: View {
         }
     }
     
-    
     @ViewBuilder
     var valueSelectionPopover: some View {
         let padding: CGFloat = -4
-        if let details = selectedDateDetails, let date = selectedDate {
+        if let details = selectedDateMaxWeightDetails, let date = selectedDate {
             VStack(alignment: .leading) {
                 Text("MAX WEIGHT").foregroundStyle(.gray).padding(.vertical, padding).font(.caption).fontWeight(.semibold)
                 HStack{

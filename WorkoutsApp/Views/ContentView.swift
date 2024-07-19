@@ -12,8 +12,19 @@ struct ContentView: View {
         TabView  {
             FilteredExerciseList()
                 .tabItem {
-                Label("Exercises", systemImage: "film.stack")
+                    Label("Exercises", systemImage: "film.stack")
                 }
+        }
+        .onAppear {
+            let appearance = UITabBarAppearance()
+            appearance.configureWithTransparentBackground()
+            appearance.backgroundEffect = UIBlurEffect(style: .systemUltraThinMaterial) // Customize the blur effect style
+            
+            // Apply the appearance to the tabBar
+            UITabBar.appearance().standardAppearance = appearance
+            if #available(iOS 15.0, *) {
+                UITabBar.appearance().scrollEdgeAppearance = appearance
+            }
         }
     }
 }

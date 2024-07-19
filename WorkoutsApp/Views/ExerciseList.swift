@@ -43,12 +43,10 @@ struct ExerciseList: View {
         }
         .navigationTitle("Exercises")
         .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                EditButton()
-            }
             ToolbarItem {
                 Button(action: addExercise) {
-                    Label("Add Item", systemImage: "plus")
+                    Text("Add Exercise")
+                        .foregroundStyle(.blue)
                 }
             }
         }

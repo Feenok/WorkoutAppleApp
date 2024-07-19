@@ -9,8 +9,9 @@ import SwiftUI
 import SwiftData
 
 struct ExerciseDetails: View {
-    @StateObject private var vm: ExerciseDetailsViewModel
+    @ObservedObject private var vm: ExerciseDetailsViewModel
     @State var selectedDate: Date? = nil
+    @State private var displayedDate: Date = Calendar.current.startOfDay(for: Date()) // Date displayed for the daily sets list
     
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
@@ -22,29 +23,38 @@ struct ExerciseDetails: View {
     
     @State private var insetExpanded = false // Check if inset for adding a set is expanded
     
-    var defaultSet = ExerciseSet(weight: 0, reps: 0)
     
     init(exercise: Exercise) {
-        _vm = StateObject(wrappedValue: ExerciseDetailsViewModel(exercise: exercise))
+        _vm = ObservedObject(wrappedValue: ExerciseDetailsViewModel(exercise: exercise))
     }
     
     var body: some View {
-        VStack {
+        Group {
             if !vm.exercise.allSets.isEmpty {
-                
-                VStack {
-                    let padding: CGFloat = -4
-                    ExerciseSetView(exerciseSet: vm.exercise.PRSet ?? defaultSet, setType: .greatest)
-                    //.opacity(selectedDate == nil ? 1.0 : 0.0)
-                    Group {
-                        ExerciseChartView(exerciseSets: vm.exercise.allSets, selectedDate: $selectedDate)
+                ScrollView {
+                    VStack {
+                        //Personal best set
+                        ExerciseSetView(exerciseSet: vm.exercise.PRSet!, setType: .greatest)
+                        
+                        //Chart
+                        Group {
+                            ExerciseChartView(sets: vm.allSetsDictionary, selectedDate: $selectedDate)
+                                .onChange(of: selectedDate) { oldValue, newValue in
+                                    if let newDate = newValue {
+                                        displayedDate = newDate
+                                    }
+                                }
+                        }
+                        .frame(height: 300)
+                        .padding(.horizontal, 8)
+                        
+                        //Latest set
+                        ExerciseSetView(exerciseSet: vm.exercise.allSets.last!, setType: .latest)
+                        
+                        //Daily Set list
+                        SetsByDateDetailsView(displayedDate: displayedDate, vm: vm)
                     }
-                    .frame(height: 300)
-                    .padding(.horizontal, 8)
-                    ExerciseSetView(exerciseSet: vm.exercise.allSets.last ?? defaultSet, setType: .latest)
-                    Spacer()
                 }
-                
             }
             else {
                 ContentUnavailableView {
@@ -54,31 +64,22 @@ struct ExerciseDetails: View {
         }
         .navigationTitle(vm.exercise.name)
         .toolbar{
-            ToolbarItem(placement: .confirmationAction) {
-                Button("Done") {
-                    dismiss()
-                }
-            }
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: {
                     withAnimation {
                         insetExpanded.toggle()
                     }
                 }) {
-                    if !insetExpanded {
-                        Label("Open adding set inset", systemImage: "plus")
-                    } else {
-                        Label("Close adding set inset", systemImage: "plus")
-                            .foregroundStyle(.gray)
-                            .opacity(0.5)
-                    }
+                    Text("Add Set")
+                        .foregroundStyle(insetExpanded ? .gray : .blue)
+                        .opacity(insetExpanded ? 0.5 : 1.0)
                 }
+                .disabled(insetExpanded)
             }
-             
         }
         .safeAreaInset(edge: .bottom) {
             if insetExpanded {
-                var today = Date.now
+                let today = Date.now
                 VStack(alignment: .center, spacing: 20) {
                     ZStack {
                         Text("Add New Set")
@@ -142,44 +143,50 @@ struct ExerciseDetails: View {
 
 struct ExerciseSetView: View {
     
-    enum setStanding {
+    enum SetStanding {
         case latest
         case greatest
     }
     
     var exerciseSet: ExerciseSet
-    var setType: setStanding
+    var setType: SetStanding
     let padding: CGFloat = -4
     
     var body: some View {
         Group {
             HStack {
-                Text(setType == .latest ? "Latest" : "PR")
+                Text(setType == .latest ? "Latest" : "Record")
+                    .padding(.trailing, -4)
                 Text("\(exerciseSet.date, format: .dateTime.year().month().day())")
-                    .foregroundStyle(.gray)
-                    .font(.subheadline)
+                    //.foregroundStyle(.primary)
+                    //.font(.subheadline)
+                    .fontWeight(.semibold)
                     .padding(.vertical, padding)
                 Spacer()
                 VStack {
                     HStack {
                         Text("\(exerciseSet.weight)")
-                            .font(.subheadline)
-                            .fontWeight(.bold)
+                            .fontWeight(.semibold)
                             .padding(.vertical, padding)
+                            .padding(.trailing, -5)
                         Text("LBS")
-                            .font(.subheadline)
+                            .font(.caption)
+                            .fontWeight(.semibold)
                             .foregroundStyle(.gray)
                             .padding(.vertical, padding)
+                            .padding(.top, 3)
                     }
                     HStack {
                         Text("\(exerciseSet.reps)")
-                            .font(.subheadline)
-                            .fontWeight(.bold)
+                            .fontWeight(.semibold)
                             .padding(.vertical, padding)
+                            .padding(.trailing, -5)
                         Text("REPS")
-                            .font(.subheadline)
+                            .font(.caption)
+                            .fontWeight(.semibold)
                             .foregroundStyle(.gray)
                             .padding(.vertical, padding)
+                            .padding(.top, 3)
                     }
                 }
             }
@@ -189,6 +196,93 @@ struct ExerciseSetView: View {
                     .foregroundStyle(Color.gray.opacity(0.12))
             }
         }
-        .padding(.horizontal, 16)
+        .padding(16)
+    }
+}
+
+
+struct SetsByDateDetailsView: View {
+    var displayedDate: Date
+    var vm: ExerciseDetailsViewModel
+    let padding: CGFloat = -4
+
+    var body: some View {
+        VStack {
+            Text("\(displayedDate, format: .dateTime.year().month().day()) - Sets")
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+                .font(.title2)
+                .fontWeight(.semibold)
+                .padding(.vertical, 8)
+
+            let dayStart = Calendar.current.startOfDay(for: displayedDate)
+            if let sets = vm.allSetsDictionary[dayStart] {
+                if sets.isEmpty {
+                    Text("No sets")
+                        .foregroundColor(.secondary)
+                } else {
+                    VStack(spacing: 0) {
+                        ForEach(Array(sets.enumerated()), id: \.element) { index, set in
+                            SetDetailRow(set: set, index: index)
+                                
+                        }
+                    }
+                    .padding(.horizontal, 4)
+                    .background(Color.gray.opacity(0.1))
+                    .cornerRadius(4)
+                }
+            } else {
+                Text("No sets for this date")
+                    .foregroundColor(.secondary)
+            }
+        }
+        .padding(.horizontal)
+        .cornerRadius(10)
+    }
+}
+
+struct SetDetailRow: View {
+    let set: ExerciseSet
+    let index: Int
+    
+    let padding: CGFloat = 8
+    
+    var body: some View {
+        VStack {
+            HStack {
+                Text("SET")
+                    .foregroundStyle(.gray)
+                    .font(.caption)
+                    .fontWeight(.semibold)
+                    .padding(.top, 4)
+                    .padding(.trailing, -5)
+                Text("\(index+1)")
+                    .foregroundStyle(.primary)
+                Spacer()
+                HStack {
+                    Text("\(set.weight)")
+                        .fontWeight(.semibold)
+                        .padding(.trailing, -5)
+                    Text("LBS")
+                        .foregroundStyle(.gray)
+                        .font(.caption)
+                        .fontWeight(.semibold)
+                        .padding(.top, 4)
+                }
+                HStack {
+                    Text("\(set.reps)")
+                        .fontWeight(.semibold)
+                        .padding(.trailing, -5)
+                    Text("REPS")
+                        .foregroundStyle(.gray)
+                        .font(.caption)
+                        .fontWeight(.semibold)
+                        .padding(.top, 4)
+                }
+            }
+            Rectangle()
+                .frame(height: 1)
+                .foregroundColor(.gray.opacity(0.1))
+        }
+        .padding(.top, 8)
     }
 }
