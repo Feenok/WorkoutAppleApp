@@ -21,6 +21,7 @@ struct ExerciseDetails: View {
     @State var newSetWeight: String?
     @State var newSetReps: String?
     
+    @State private var showingMoreData = false // Check if showing more set data
     @State private var insetExpanded = false // Check if inset for adding a set is expanded
     
     
@@ -29,6 +30,8 @@ struct ExerciseDetails: View {
     }
     
     var body: some View {
+        let displayedDateStart = Calendar.current.startOfDay(for: displayedDate)
+        
         Group {
             if !vm.exercise.allSets.isEmpty {
                 ScrollView {
@@ -38,7 +41,7 @@ struct ExerciseDetails: View {
                         
                         //Chart
                         Group {
-                            ExerciseChartView(sets: vm.allSetsDictionary, selectedDate: $selectedDate)
+                            ExerciseChartView(sets: vm.allSetsDictionary, rawSelectedDate: $selectedDate)
                                 .onChange(of: selectedDate) { oldValue, newValue in
                                     if let newDate = newValue {
                                         displayedDate = newDate
@@ -50,6 +53,22 @@ struct ExerciseDetails: View {
                         
                         //Latest set
                         ExerciseSetView(exerciseSet: vm.exercise.allSets.last!, setType: .latest)
+                        
+                        //Show more data
+                        
+                        if showingMoreData {
+                            MoreDataView(displayedDate: displayedDate, vm: vm, showingMoreData: $showingMoreData)
+                        } else {
+                            Button(action: {
+                                withAnimation {
+                                    showingMoreData = true
+                                }
+                            }) {
+                                Text("Show More Exercise Data")
+                                    .foregroundStyle(vm.allSetsDictionary[displayedDateStart] != nil ? .blue : .gray.opacity(0))
+                            }
+                            .disabled(vm.allSetsDictionary[displayedDateStart] == nil)
+                        }
                         
                         //Daily Set list
                         SetsByDateDetailsView(displayedDate: displayedDate, vm: vm)
@@ -155,11 +174,9 @@ struct ExerciseSetView: View {
     var body: some View {
         Group {
             HStack {
-                Text(setType == .latest ? "Latest" : "Record")
+                Text(setType == .latest ? "Latest:" : "Record:")
                     .padding(.trailing, -4)
                 Text("\(exerciseSet.date, format: .dateTime.year().month().day())")
-                    //.foregroundStyle(.primary)
-                    //.font(.subheadline)
                     .fontWeight(.semibold)
                     .padding(.vertical, padding)
                 Spacer()
@@ -200,6 +217,76 @@ struct ExerciseSetView: View {
     }
 }
 
+struct MoreDataView: View {
+    
+    var displayedDate: Date
+    var vm: ExerciseDetailsViewModel
+    @Binding var showingMoreData: Bool
+    
+    var body: some View {
+        
+        let dayStart = Calendar.current.startOfDay(for: displayedDate)
+        
+        let totalWeight: Int = vm.allSetsDictionary[dayStart]!.reduce(0) { sum, set in
+            sum + (set.weight * set.reps)
+        }
+        let totalReps: Int = vm.allSetsDictionary[dayStart]!.reduce(0) { sum, set in
+            sum + set.reps
+        }
+        let averageRepWeight: Int = (totalWeight/totalReps)
+        let volumeLoad: Int = totalWeight
+        
+        VStack (alignment: .leading) {
+            HStack {
+                Image(systemName: "dumbbell.fill")
+                    .foregroundStyle(.blue)
+                    .padding(.trailing, -5)
+                Text("Weight & Reps")
+                    .foregroundStyle(.blue)
+                    .fontWeight(.bold)
+            }
+            .padding(.horizontal)
+            
+            Group {
+                Text("You've completed a total of ") +
+                Text("\(totalReps)").bold() +
+                Text(" reps with an average weight of ") +
+                Text("\(averageRepWeight)").bold() +
+                Text(" lbs.")
+            }
+            .padding()
+            
+            HStack {
+                Image(systemName: "flame.fill")
+                    .foregroundStyle(.blue)
+                    .padding(.trailing, -5)
+                Text("Volume Load")
+                    .foregroundStyle(.blue)
+                    .fontWeight(.bold)
+            }
+            .padding(.horizontal)
+            
+            Group {
+                Text("You've lifted a volume load of ") +
+                Text("\(volumeLoad)").bold() +
+                Text(" lbs.")
+            }
+            .padding()
+            
+            Button(action: {
+                withAnimation {
+                    showingMoreData = false
+                }
+            }, label: {
+                Text("Collapse Additional Data")
+                    .foregroundStyle(.red)
+            })
+            .frame(maxWidth: .infinity, alignment: .center)
+        }
+    }
+    
+}
+
 
 struct SetsByDateDetailsView: View {
     var displayedDate: Date
@@ -210,8 +297,8 @@ struct SetsByDateDetailsView: View {
         VStack {
             Text("\(displayedDate, format: .dateTime.year().month().day()) - Sets")
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
-                .font(.title2)
-                .fontWeight(.semibold)
+                .font(.title3)
+                .fontWeight(.bold)
                 .padding(.vertical, 8)
 
             let dayStart = Calendar.current.startOfDay(for: displayedDate)
@@ -249,7 +336,7 @@ struct SetDetailRow: View {
     var body: some View {
         VStack {
             HStack {
-                Text("SET")
+                Text("SET:")
                     .foregroundStyle(.gray)
                     .font(.caption)
                     .fontWeight(.semibold)

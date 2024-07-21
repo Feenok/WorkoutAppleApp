@@ -12,10 +12,20 @@ struct ExerciseChartView: View {
     
     var sets: [Date:[ExerciseSet]]
     @Environment(\.calendar) var calendar
-    @Binding var selectedDate: Date?
+    @Binding var rawSelectedDate: Date?
     
     func endOfDay(for date: Date) -> Date {
         calendar.date(byAdding: .day, value: 1, to: date)!
+    }
+    
+    var selectedDate: Date? {
+        if let rawSelectedDate {
+            return sets.keys.first(where: { date in
+                let endOfDay = endOfDay(for: date)
+                return (date ... endOfDay).contains(rawSelectedDate)
+            })
+        }
+        return nil
     }
     
     var selectedDateMaxWeightDetails: (weight: Int, reps: Int)? {
@@ -58,7 +68,7 @@ struct ExerciseChartView: View {
                 }
             }
         }
-        .chartXSelection(value: $selectedDate)
+        .chartXSelection(value: $rawSelectedDate)
         .padding(8)
         .chartScrollableAxes(.horizontal)
         .chartXVisibleDomain(length: 3600 * 24 * 21)
