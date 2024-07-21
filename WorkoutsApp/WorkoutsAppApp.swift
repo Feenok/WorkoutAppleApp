@@ -13,7 +13,8 @@ struct WorkoutsAppApp: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             Exercise.self,
-            ExerciseSet.self
+            ExerciseSet.self,
+            Workout.self
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 

@@ -56,12 +56,12 @@ struct ExerciseChartView: View {
                 )
                 .foregroundStyle(Color.red.opacity(0.3))
                 .offset(yStart: -10)
-                .zIndex(0)
+                .zIndex(1)
                 .annotation(
                     position: .top, spacing: 0,
                     overflowResolution: .init(
                         x: .fit(to: .chart),
-                        y: .fit(to: .chart)
+                        y: .disabled
                     )
                 ) {
                     valueSelectionPopover
@@ -131,6 +131,4 @@ struct ExerciseChartView: View {
     }
     
 }
-
-
 

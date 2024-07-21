@@ -12,7 +12,15 @@ struct ContentView: View {
         TabView  {
             FilteredExerciseList()
                 .tabItem {
-                    Label("Exercises", systemImage: "film.stack")
+                    Label("Exercises", systemImage: "dumbbell.fill")
+                }
+            FilteredWorkoutList()
+                .tabItem {
+                    Label("Workouts", systemImage: "list.bullet.circle.fill")
+                }
+            TimerView()
+                .tabItem {
+                    Label("Timer", systemImage: "fitness.timer.fill")
                 }
         }
         .onAppear {

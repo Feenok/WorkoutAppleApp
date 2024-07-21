@@ -15,7 +15,6 @@ class ExerciseDetailsViewModel: ObservableObject {
     
     init(exercise: Exercise) {
         self.exercise = exercise
-        
         initializeSetsDictionary()
     }
     
