@@ -9,17 +9,19 @@ import Foundation
 import SwiftData
 
 @Model
-final class WorkoutTemplateSet {
+final class WorkoutTemplateSet: Identifiable {
+    let id = UUID()
     var name: String
-    
     var targetWeight: Int
     var targetReps: Int
     var date: Date = Date.now
+    @Relationship(inverse: \Workout.templateSets) var workout: Workout?
     
-    init(name: String, targetWeight: Int = 0, targetReps: Int = 0) {
+    init(name: String, targetWeight: Int = 0, targetReps: Int = 0, workout: Workout? = nil) {
         self.name = name
         self.targetWeight = targetWeight
         self.targetReps = targetReps
+        self.workout = workout
     }
     
 }

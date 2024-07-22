@@ -13,7 +13,7 @@ struct WorkoutDetails: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
     
-    @State private var setToAdd: WorkoutTemplateSet?
+    @State private var newWorkoutTemplateSet: WorkoutTemplateSet?
     @State private var isEditing: Bool = false
     @State private var showingAlert = false
     
@@ -24,47 +24,7 @@ struct WorkoutDetails: View {
     var body: some View {
         Group {
             if !workout.templateSets.isEmpty {
-                List {
-                    ForEach(sortedSets) {set in
-                        VStack {
-                            Text("\(set.name)")
-                            if isEditing {
-                                HStack {
-                                    TextField("Weight", value: Binding(
-                                        get: { set.targetWeight },
-                                        set: { set.targetWeight = $0 }
-                                    ), formatter: NumberFormatter())
-                                    .keyboardType(.numberPad)
-                                    Text("LBS")
-                                    Spacer()
-                                    TextField("Reps", value: Binding(
-                                        get: { set.targetReps },
-                                        set: { set.targetReps = $0 }
-                                    ), formatter: NumberFormatter())
-                                    .keyboardType(.numberPad)
-                                    Text("REPS")
-                                }
-                            } else {
-                                HStack {
-                                    Text("Weight: \(set.targetWeight) LBS")
-                                    Spacer()
-                                    Text("Reps: \(set.targetReps) REPS")
-                                }
-                            }
-                        }
-                    }
-                    .onDelete(perform: isEditing ? deleteWorkoutSets : nil)
-                }
-                
-                if isEditing {
-                    Button(action: addWorkoutSet) {
-                        Label("Add Set", systemImage: "plus")
-                    }
-                } else {
-                    Button(action: { showingAlert = true }) {
-                        Label("Track Selected Sets", systemImage: "checkmark.circle")
-                    }
-                }
+                workoutList
             } else {
                 ContentUnavailableView {
                     Button(action: addWorkoutSet) {
@@ -84,6 +44,12 @@ struct WorkoutDetails: View {
                 }
             }
         }
+        .sheet(item: $newWorkoutTemplateSet) { set in
+            NavigationStack {
+                EnterWorkoutSet(workout: workout, newWorkoutTemplateSet: set)
+            }
+            .interactiveDismissDisabled()
+        }
         .alert("Confirm Workout", isPresented: $showingAlert) {
             Button("Cancel", role: .cancel) { }
             Button("Confirm") {
@@ -95,12 +61,8 @@ struct WorkoutDetails: View {
     }
     
     private func addWorkoutSet() {
-        withAnimation {
-            let newItem = WorkoutTemplateSet(name: "")
-            modelContext.insert(newItem)
-            workout.templateSets.append(newItem)
-            setToAdd = newItem
-        }
+        let newItem = WorkoutTemplateSet(name: "", targetWeight: 0, targetReps: 0)
+        newWorkoutTemplateSet = newItem
     }
 
     private func deleteWorkoutSets(offsets: IndexSet) {
@@ -112,5 +74,52 @@ struct WorkoutDetails: View {
             }
         }
     }
+    
+    @ViewBuilder
+    private var workoutList: some View {
+        List {
+            ForEach(sortedSets) {set in
+                VStack {
+                    Text("\(set.name)")
+                    if isEditing {
+                        HStack {
+                            TextField("Weight", value: Binding(
+                                get: { set.targetWeight },
+                                set: { set.targetWeight = $0 }
+                            ), formatter: NumberFormatter())
+                            .keyboardType(.numberPad)
+                            Text("LBS")
+                            Spacer()
+                            TextField("Reps", value: Binding(
+                                get: { set.targetReps },
+                                set: { set.targetReps = $0 }
+                            ), formatter: NumberFormatter())
+                            .keyboardType(.numberPad)
+                            Text("REPS")
+                        }
+                    } else {
+                        HStack {
+                            Text("Weight: \(set.targetWeight) LBS")
+                            Spacer()
+                            Text("Reps: \(set.targetReps) REPS")
+                        }
+                    }
+                }
+            }
+            .onDelete(perform: isEditing ? deleteWorkoutSets : nil)
+        }
+        
+        if isEditing {
+            Button(action: addWorkoutSet) {
+                Label("Add Set", systemImage: "plus")
+            }
+        } else {
+            Button(action: { showingAlert = true }) {
+                Label("Track Selected Sets", systemImage: "checkmark.circle")
+            }
+        }
+    }
+    
 }
+
 
