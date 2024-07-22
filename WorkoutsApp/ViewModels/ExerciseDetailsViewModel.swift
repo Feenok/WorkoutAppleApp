@@ -53,6 +53,29 @@ class ExerciseDetailsViewModel: ObservableObject {
         }
     }
     
+    func deleteSet(_ set: ExerciseSet) {
+        // Remove from allSets
+        if let index = exercise.allSets.firstIndex(where: { $0.id == set.id }) {
+            exercise.allSets.remove(at: index)
+        }
+        
+        // Remove from allSetsDictionary
+        let dayStart = Calendar.current.startOfDay(for: set.date)
+        if var setsForDay = allSetsDictionary[dayStart] {
+            setsForDay.removeAll { $0.id == set.id }
+            if setsForDay.isEmpty {
+                allSetsDictionary[dayStart] = nil
+            } else {
+                allSetsDictionary[dayStart] = setsForDay
+            }
+        }
+        
+        // Update PRSet if necessary
+        if exercise.PRSet?.id == set.id {
+            exercise.PRSet = exercise.allSets.max(by: { $0.weight < $1.weight })
+        }
+    }
+    
     //UI FUNCTIONS
     func getPeakSetForDate(_ date: Date) -> ExerciseSet? {
         let dayStart = Calendar.current.startOfDay(for: date)

@@ -290,33 +290,47 @@ struct MoreDataView: View {
 
 struct SetsByDateDetailsView: View {
     var displayedDate: Date
-    var vm: ExerciseDetailsViewModel
+    @ObservedObject var vm: ExerciseDetailsViewModel
+    
+    @State private var setDeletionEnabled: Bool = false
+    @State private var setToDelete: (set: ExerciseSet, index: Int)?
+    
     let padding: CGFloat = -4
+    
+    private var hasSetsForDate: Bool {
+            let dayStart = Calendar.current.startOfDay(for: displayedDate)
+            return !(vm.allSetsDictionary[dayStart]?.isEmpty ?? true)
+        }
 
     var body: some View {
         VStack {
-            Text("\(displayedDate, format: .dateTime.year().month().day()) - Sets")
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
-                .font(.title3)
-                .fontWeight(.bold)
-                .padding(.vertical, 8)
+            HStack {
+                Text("\(displayedDate, format: .dateTime.year().month().day()) - Sets")
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+                    .font(.title3)
+                    .fontWeight(.bold)
+                    .padding(.vertical, 8)
+                
+                if hasSetsForDate {
+                    Button(action: {
+                        setDeletionEnabled.toggle()
+                    }, label: {
+                        Text(setDeletionEnabled ? "Cancel" : "Delete Set")
+                            .foregroundStyle(.red)
+                    })
+                }
+            }
 
             let dayStart = Calendar.current.startOfDay(for: displayedDate)
-            if let sets = vm.allSetsDictionary[dayStart] {
-                if sets.isEmpty {
-                    Text("No sets")
-                        .foregroundColor(.secondary)
-                } else {
-                    VStack(spacing: 0) {
-                        ForEach(Array(sets.enumerated()), id: \.element) { index, set in
-                            SetDetailRow(set: set, index: index)
-                                
-                        }
+            if let sets = vm.allSetsDictionary[dayStart], !sets.isEmpty {
+                VStack(spacing: 0) {
+                    ForEach(Array(sets.enumerated()), id: \.element) { index, set in
+                        SetDetailRow(set: set, index: index, onDelete: {setToDelete = (set: set, index: index + 1)}, deletionEnabled: setDeletionEnabled)
                     }
-                    .padding(.horizontal, 4)
-                    .background(Color.gray.opacity(0.1))
-                    .cornerRadius(4)
                 }
+                .padding(.horizontal, 4)
+                .background(Color.gray.opacity(0.1))
+                .cornerRadius(4)
             } else {
                 Text("No sets for this date")
                     .foregroundColor(.secondary)
@@ -324,13 +338,30 @@ struct SetsByDateDetailsView: View {
         }
         .padding(.horizontal)
         .cornerRadius(10)
+        .alert("Confirm Deletion", isPresented: Binding(
+            get: { setToDelete != nil },
+            set: { if !$0 { setToDelete = nil } }
+        )) {
+            Button("Cancel", role: .cancel) { setToDelete = nil }
+            Button("Delete", role: .destructive) {
+                if let setInfo = setToDelete {
+                    vm.deleteSet(setInfo.set)
+                    setToDelete = nil
+                }
+            }
+        } message: {
+            if let setInfo = setToDelete {
+                Text("Are you sure you want to delete set \(setInfo.index)?")
+            }
+        }
     }
 }
 
 struct SetDetailRow: View {
     let set: ExerciseSet
     let index: Int
-    
+    let onDelete: () -> Void
+    let deletionEnabled: Bool
     let padding: CGFloat = 8
     
     var body: some View {
@@ -365,6 +396,14 @@ struct SetDetailRow: View {
                         .fontWeight(.semibold)
                         .padding(.top, 4)
                 }
+                
+                if deletionEnabled {
+                    Button(action: onDelete) {
+                        Image(systemName: "trash")
+                            .foregroundColor(.red)
+                    }
+                }
+                
             }
             Rectangle()
                 .frame(height: 1)

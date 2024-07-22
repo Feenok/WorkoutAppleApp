@@ -92,12 +92,6 @@ struct WorkoutDetails: View {
         } message: {
             Text("Are you sure you want to add these sets to your exercises?")
         }
-        .sheet(item: $setToAdd) { set in
-            NavigationStack {
-                EnterWorkoutSet(workout: workout)
-            }
-            .interactiveDismissDisabled()
-        }
     }
     
     private func addWorkoutSet() {

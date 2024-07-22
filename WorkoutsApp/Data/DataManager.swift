@@ -26,8 +26,10 @@ class DataManager {
             viewModel.addSet(newSet: newSet)
             
             // Update the exercise in SwiftData
-            exercise.allSets = viewModel.exercise.allSets
-            exercise.PRSet = viewModel.exercise.PRSet
+            viewModel.addSet(newSet: newSet)
+            // TODO: Delete Below
+            //exercise.allSets = viewModel.exercise.allSets
+            //exercise.PRSet = viewModel.exercise.PRSet
         }
         
         try? modelContext.save()
