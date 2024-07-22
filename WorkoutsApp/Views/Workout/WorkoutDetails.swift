@@ -14,7 +14,8 @@ struct WorkoutDetails: View {
     @Environment(\.modelContext) private var modelContext
     
     @State private var setToAdd: WorkoutTemplateSet?
-    @State var isEditing: Bool = false
+    @State private var isEditing: Bool = false
+    @State private var showingAlert = false
     
     var sortedSets: [WorkoutTemplateSet] {
         workout.templateSets.sorted { $0.date < $1.date }
@@ -54,9 +55,14 @@ struct WorkoutDetails: View {
                     }
                     .onDelete(perform: isEditing ? deleteWorkoutSets : nil)
                 }
+                
                 if isEditing {
                     Button(action: addWorkoutSet) {
                         Label("Add Set", systemImage: "plus")
+                    }
+                } else {
+                    Button(action: { showingAlert = true }) {
+                        Label("Track Selected Sets", systemImage: "checkmark.circle")
                     }
                 }
             } else {
@@ -78,6 +84,14 @@ struct WorkoutDetails: View {
                 }
             }
         }
+        .alert("Confirm Workout", isPresented: $showingAlert) {
+            Button("Cancel", role: .cancel) { }
+            Button("Confirm") {
+                DataManager.shared.addWorkoutSetsToExercises(workout: workout, modelContext: modelContext)
+            }
+        } message: {
+            Text("Are you sure you want to add these sets to your exercises?")
+        }
         .sheet(item: $setToAdd) { set in
             NavigationStack {
                 EnterWorkoutSet(workout: workout)
@@ -90,6 +104,7 @@ struct WorkoutDetails: View {
         withAnimation {
             let newItem = WorkoutTemplateSet(name: "")
             modelContext.insert(newItem)
+            workout.templateSets.append(newItem)
             setToAdd = newItem
         }
     }
@@ -97,7 +112,9 @@ struct WorkoutDetails: View {
     private func deleteWorkoutSets(offsets: IndexSet) {
         withAnimation {
             for index in offsets {
-                modelContext.delete(workout.templateSets[index])
+                let setToDelete = sortedSets[index]
+                workout.templateSets.removeAll { $0.id == setToDelete.id }
+                modelContext.delete(setToDelete)
             }
         }
     }
