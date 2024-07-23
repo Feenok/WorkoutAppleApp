@@ -18,9 +18,9 @@ struct ContentView: View {
                 .tabItem {
                     Label("Workouts", systemImage: "list.bullet.circle.fill")
                 }
-            TimerView()
+            StopwatchView()
                 .tabItem {
-                    Label("Timer", systemImage: "fitness.timer.fill")
+                    Label("Stopwatch", systemImage: "fitness.timer.fill")
                 }
         }
         .onAppear {
