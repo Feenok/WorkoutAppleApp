@@ -18,11 +18,14 @@ struct ExerciseDetails: View {
     
     // New exercise info to be added
     @State var newSetDate: Date = Date.now
-    @State var newSetWeight: String?
-    @State var newSetReps: String?
+    @State private var newSetWeight: String?
+    @State private var newSetReps: String?
+    @State private var minutes: String?
+    @State private var seconds: String?
     
     @State private var showingMoreData = false // Check if showing more set data
     @State private var insetExpanded = false // Check if inset for adding a set is expanded
+    @State private var timedExercise = false // Check if exercise has a duration
     
     
     init(exercise: Exercise) {
@@ -57,15 +60,15 @@ struct ExerciseDetails: View {
                         //Show more data
                         
                         if showingMoreData {
-                            MoreDataView(displayedDate: displayedDate, vm: vm, showingMoreData: $showingMoreData)
+                            MoreDataView(displayedDate: displayedDate, vm: vm, timedExercise: timedExercise, showingMoreData: $showingMoreData)
                         } else {
                             Button(action: {
                                 withAnimation {
                                     showingMoreData = true
                                 }
                             }) {
-                                Text("Show More Exercise Data")
-                                    .foregroundStyle(vm.allSetsDictionary[displayedDateStart] != nil ? .blue : .gray.opacity(0))
+                                Text(vm.allSetsDictionary[displayedDateStart] != nil ? "Show More Exercise Data" : "No Exercise Data")
+                                    .foregroundStyle(vm.allSetsDictionary[displayedDateStart] != nil ? .blue : .gray)
                             }
                             .disabled(vm.allSetsDictionary[displayedDateStart] == nil)
                         }
@@ -98,67 +101,155 @@ struct ExerciseDetails: View {
         }
         .safeAreaInset(edge: .bottom) {
             if insetExpanded {
-                let today = Date.now
-                VStack(alignment: .center, spacing: 20) {
-                    ZStack {
-                        Text("Add New Set")
-                            .font(.headline)
-                        HStack {
-                            Spacer()
-                            Button("Save") {
-                                if let weight = Int(newSetWeight ?? ""),
-                                   let reps = Int(newSetReps ?? "") {
-                                    let newSet = ExerciseSet(weight: weight, reps: reps, date: newSetDate)
-                                    vm.addSet(newSet: newSet)
-                                    
-                                    newSetWeight = nil
-                                    newSetReps = nil
-                                    //newSetDate = Date.now
-                                }
-                            }
-                            .bold()
-                            .disabled(newSetWeight?.isEmpty ?? true || newSetReps?.isEmpty ?? true)
-                            .opacity(!(newSetWeight?.isEmpty ?? true) && !(newSetReps?.isEmpty ?? true) ? 1.0 : 0.5)
-                        }
-                        HStack {
-                            Button("Cancel") {
-                                withAnimation {
-                                    insetExpanded.toggle()
-                                }
-                            }
-                            .foregroundStyle(.red)
-                            Spacer()
-                        }
-                    }
-                    DatePicker(selection: $newSetDate, in: ...today, displayedComponents: .date) {
-                        HStack {
-                            TextField("Weight", text: Binding(
-                                get: { self.newSetWeight ?? "" },
-                                set: { self.newSetWeight = $0.isEmpty ? nil : $0 }
-                            ))
-                            .textFieldStyle(.roundedBorder)
-                            .keyboardType(.numberPad)
-                            .onChange(of: newSetWeight) { _, newValue in
-                                newSetWeight = newValue?.filter { "0123456789".contains($0) }
-                            }
-                            TextField("Reps", text: Binding(
-                                get: { self.newSetReps ?? "" },
-                                set: { self.newSetReps = $0.isEmpty ? nil : $0 }
-                            ))
-                            .textFieldStyle(.roundedBorder)
-                            .keyboardType(.numberPad)
-                            .onChange(of: newSetReps) { _, newValue in
-                                newSetReps = newValue?.filter { "0123456789".contains($0) }
-                            }
-                        }
-                    }
-                }
-                .padding()
-                .background(.bar)
+                AddNewSetView(
+                    vm: vm,
+                    insetExpanded: $insetExpanded,
+                    newSetWeight: $newSetWeight,
+                    newSetReps: $newSetReps,
+                    newSetDate: $newSetDate,
+                    minutes: $minutes,
+                    seconds: $seconds,
+                    timedExercise: $timedExercise
+                )
             }
         }
     }
 }
+
+struct AddNewSetView: View {
+    @ObservedObject var vm: ExerciseDetailsViewModel
+    @Binding var insetExpanded: Bool
+    @Binding var newSetWeight: String?
+    @Binding var newSetReps: String?
+    @Binding var newSetDate: Date
+    @Binding var minutes: String?
+    @Binding var seconds: String?
+    @Binding var timedExercise: Bool
+    
+    var body: some View {
+        let today = Date.now
+        VStack(alignment: .center, spacing: 20) {
+            ZStack {
+                Text("Add New Set")
+                    .font(.headline)
+                HStack {
+                    Spacer()
+                    Button(action: {
+                        if let weight = Int(newSetWeight ?? ""),
+                           let reps = Int(newSetReps ?? "")
+                        {
+                            if Calendar.current.isDateInToday(newSetDate) {
+                                newSetDate = today
+                            }
+                            
+                            let newSet = ExerciseSet(weight: weight, reps: reps, date: newSetDate)
+                            
+                            // Add duration data if timed
+                            if timedExercise {
+                                let minutesInt = Int(minutes ?? "") ?? 0
+                                let secondsInt = Int(seconds ?? "") ?? 0
+                                if let duration = vm.getDuration(minutes: minutesInt, seconds: secondsInt) {
+                                    newSet.duration = duration
+                                }
+                            }
+                            
+                            vm.addSet(newSet: newSet)
+                            
+                            // Reset new set data
+                            newSetWeight = nil
+                            newSetReps = nil
+                            minutes = nil
+                            seconds = nil
+                            newSetDate = Date.now
+                        }
+                    }) {
+                        Text("Save")
+                    }
+                    .disabled(newSetWeight?.isEmpty ?? true || newSetReps?.isEmpty ?? true || timedExercise && minutes?.isEmpty ?? true && seconds?.isEmpty ?? true)
+                    .opacity(!(newSetWeight?.isEmpty ?? true) && !(newSetReps?.isEmpty ?? true) ? 1.0 : 0.5)
+                }
+                HStack {
+                    Button("Cancel") {
+                        withAnimation {
+                            insetExpanded.toggle()
+                        }
+                    }
+                    .foregroundStyle(.red)
+                    Spacer()
+                }
+            }
+            DatePicker(selection: $newSetDate, in: ...today, displayedComponents: .date) {
+                HStack {
+                    TextField("Weight", text: Binding(
+                        get: { self.newSetWeight ?? "" },
+                        set: { self.newSetWeight = $0.isEmpty ? nil : $0 }
+                    ))
+                    .textFieldStyle(.roundedBorder)
+                    .keyboardType(.numberPad)
+                    .onChange(of: newSetWeight) { _, newValue in
+                        newSetWeight = newValue?.filter { "0123456789".contains($0) }
+                    }
+                    TextField("Reps", text: Binding(
+                        get: { self.newSetReps ?? "" },
+                        set: { self.newSetReps = $0.isEmpty ? nil : $0 }
+                    ))
+                    .textFieldStyle(.roundedBorder)
+                    .keyboardType(.numberPad)
+                    .onChange(of: newSetReps) { _, newValue in
+                        newSetReps = newValue?.filter { "0123456789".contains($0) }
+                    }
+                }
+            }
+            Button("Timed Exercise") {
+                //Add duration of exercise
+                    timedExercise.toggle()
+            }
+            .foregroundStyle(timedExercise ? .red : .blue)
+            .frame(maxWidth: .infinity, alignment: .center)
+            
+            if timedExercise {
+                withAnimation{
+                    SetDurationInputView(minutes: $minutes, seconds: $seconds)
+                }
+            }
+            
+        }
+        .padding()
+        .background(.bar)
+    }
+    
+}
+
+struct SetDurationInputView: View {
+    @Binding var minutes: String?
+    @Binding var seconds: String?
+    
+    var body: some View {
+        HStack {
+            TextField("Min", text: Binding(
+                get: { self.minutes ?? "" },
+                set: { self.minutes = $0.isEmpty ? nil : $0 }
+            ))
+                .keyboardType(.numberPad)
+                .frame(width: 100)
+                .onChange(of: minutes) { _, newValue in
+                    minutes = newValue?.filter { "0123456789".contains($0) }
+                }
+            Text(":")
+            TextField("Sec", text: Binding(
+                get: { self.seconds ?? "" },
+                set: { self.seconds = $0.isEmpty ? nil : $0 }
+            ))
+                .keyboardType(.numberPad)
+                .frame(width: 100)
+                .onChange(of: seconds) { _, newValue in
+                    seconds = newValue?.filter { "0123456789".contains($0) }
+                }
+        }
+        .textFieldStyle(RoundedBorderTextFieldStyle())
+    }
+}
+
 
 struct ExerciseSetView: View {
     
@@ -221,6 +312,7 @@ struct MoreDataView: View {
     
     var displayedDate: Date
     var vm: ExerciseDetailsViewModel
+    var timedExercise: Bool
     @Binding var showingMoreData: Bool
     
     var body: some View {
@@ -235,6 +327,10 @@ struct MoreDataView: View {
         }
         let averageRepWeight: Int = (totalWeight/totalReps)
         let volumeLoad: Int = totalWeight
+        
+        let totalDuration: TimeInterval = vm.allSetsDictionary[dayStart]!.reduce(0) { sum, set in
+            sum + (set.duration ?? 0)
+        }
         
         VStack (alignment: .leading) {
             HStack {
@@ -273,6 +369,40 @@ struct MoreDataView: View {
             }
             .padding()
             
+            if totalDuration > 0 {
+                HStack {
+                    Image(systemName: "stopwatch.fill")
+                        .foregroundStyle(.blue)
+                        .padding(.trailing, -5)
+                    Text("Stopwatch")
+                        .foregroundStyle(.blue)
+                        .fontWeight(.bold)
+                }
+                .padding(.horizontal)
+                
+                Group {
+                    let (minutes, seconds) = secondsToMinutesAndSeconds(Int(totalDuration))
+                    if minutes > 0 {
+                        if seconds > 0 {
+                        Text("The total duration of today's sets is ") +
+                        Text("\(minutes)").bold() +
+                        Text(" minutes and ") +
+                        Text("\(seconds)").bold() +
+                        Text(" seconds.")
+                        } else {
+                            Text("The total duration of today's sets is ") +
+                            Text("\(minutes)").bold() +
+                            Text(" minutes.")
+                        }
+                    } else {
+                        Text("The total duration of today's sets is ") +
+                        Text("\(seconds)").bold() +
+                        Text(" seconds.")
+                    }
+                }
+                .padding()
+            }
+            
             Button(action: {
                 withAnimation {
                     showingMoreData = false
@@ -283,6 +413,10 @@ struct MoreDataView: View {
             })
             .frame(maxWidth: .infinity, alignment: .center)
         }
+    }
+    
+    private func secondsToMinutesAndSeconds(_ seconds: Int) -> (Int, Int) {
+        return (seconds / 60, seconds % 60)
     }
     
 }

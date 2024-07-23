@@ -12,16 +12,18 @@ import SwiftData
 final class ExerciseSet: Identifiable {
     // An exercise with its weights, and reps info
     var id = UUID()
-    //var exercise: Exercise
     var weight: Int
     var reps: Int
+    var duration: TimeInterval?
     var date: Date
+    @Relationship(inverse: \Exercise.allSets) var exercise: Exercise?
     
-    init(/*exercise: Exercise,*/ weight: Int, reps: Int, date: Date = Date()) {
-        //self.exercise = exercise
+    init(weight: Int, reps: Int, duration: TimeInterval? = nil, date: Date = Date(), exercise: Exercise? = nil) {
         self.weight = weight
         self.reps = reps
+        self.duration = duration
         self.date = date
+        self.exercise = exercise
     }
     
 }
