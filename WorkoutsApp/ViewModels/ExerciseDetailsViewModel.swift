@@ -53,6 +53,10 @@ class ExerciseDetailsViewModel: ObservableObject {
         }
     }
     
+    func findLatestSet(consideringLast count: Int = 100) -> ExerciseSet? {
+        exercise.allSets.suffix(count).max(by: { $0.date < $1.date })
+    }
+    
     func deleteSet(_ set: ExerciseSet) {
         // Remove from allSets
         if let index = exercise.allSets.firstIndex(where: { $0.id == set.id }) {

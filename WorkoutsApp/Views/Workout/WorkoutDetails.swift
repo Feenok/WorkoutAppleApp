@@ -50,7 +50,7 @@ struct WorkoutDetails: View {
             }
             .interactiveDismissDisabled()
         }
-        .alert("Confirm Workout", isPresented: $showingAlert) {
+        .alert("Track Workout", isPresented: $showingAlert) {
             Button("Cancel", role: .cancel) { }
             Button("Confirm") {
                 DataManager.shared.addWorkoutSetsToExercises(workout: workout, modelContext: modelContext)

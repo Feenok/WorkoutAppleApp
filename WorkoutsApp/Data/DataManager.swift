@@ -13,13 +13,16 @@ class DataManager {
     private init() {}
     
     func addWorkoutSetsToExercises(workout: Workout, modelContext: ModelContext) {
-        for templateSet in workout.templateSets {
+        
+        let sortedSets = workout.templateSets.sorted { $0.date < $1.date }
+        
+        for templateSet in sortedSets {
             guard let exercise = fetchExercise(name: templateSet.name, context: modelContext) else {
                 print("Exercise not found: \(templateSet.name)")
                 continue
             }
             
-            let newSet = ExerciseSet(weight: templateSet.targetWeight, reps: templateSet.targetReps, date: Date())
+            let newSet = ExerciseSet(weight: templateSet.targetWeight, reps: templateSet.targetReps, date: Date.now)
             
             // Create a temporary ViewModel to handle the dictionary updates
             let viewModel = ExerciseDetailsViewModel(exercise: exercise)
@@ -27,9 +30,6 @@ class DataManager {
             
             // Update the exercise in SwiftData
             viewModel.addSet(newSet: newSet)
-            // TODO: Delete Below
-            //exercise.allSets = viewModel.exercise.allSets
-            //exercise.PRSet = viewModel.exercise.PRSet
         }
         
         try? modelContext.save()

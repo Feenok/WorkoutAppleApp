@@ -52,7 +52,7 @@ struct ExerciseDetails: View {
                         .padding(.horizontal, 8)
                         
                         //Latest set
-                        ExerciseSetView(exerciseSet: vm.exercise.allSets.last!, setType: .latest)
+                        ExerciseSetView(exerciseSet: vm.findLatestSet()!, setType: .latest)
                         
                         //Show more data
                         
@@ -113,7 +113,7 @@ struct ExerciseDetails: View {
                                     
                                     newSetWeight = nil
                                     newSetReps = nil
-                                    newSetDate = Date.now
+                                    //newSetDate = Date.now
                                 }
                             }
                             .bold()
@@ -323,8 +323,11 @@ struct SetsByDateDetailsView: View {
 
             let dayStart = Calendar.current.startOfDay(for: displayedDate)
             if let sets = vm.allSetsDictionary[dayStart], !sets.isEmpty {
+                
+                let sortedSets = sets.sorted { $0.date < $1.date }
+                
                 VStack(spacing: 0) {
-                    ForEach(Array(sets.enumerated()), id: \.element) { index, set in
+                    ForEach(Array(sortedSets.enumerated()), id: \.element) { index, set in
                         SetDetailRow(set: set, index: index, onDelete: {setToDelete = (set: set, index: index + 1)}, deletionEnabled: setDeletionEnabled)
                     }
                 }
