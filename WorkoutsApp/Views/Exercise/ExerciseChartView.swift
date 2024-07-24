@@ -39,6 +39,10 @@ struct ExerciseChartView: View {
     }
     
     var body: some View {
+        let maxWeight = sets.values.flatMap { $0 }.max(by: { $0.weight < $1.weight })?.weight ?? 0
+        let yAxisMax = Double(maxWeight) * 1.3
+        let mostRecentDate = sets.keys.max() ?? Date()
+        
         Chart {
             ForEach(Array(sets.keys), id: \.self) { date in
                 if let maxSet = sets[date]?.max(by: { $0.weight < $1.weight }) {
@@ -58,10 +62,12 @@ struct ExerciseChartView: View {
                 .offset(yStart: -10)
                 .zIndex(1)
                 .annotation(
-                    position: .top, spacing: 0,
+                    position: .top, 
+                    alignment: sets.count < 9 ? .trailing : .leading,
+                    spacing: 0,
                     overflowResolution: .init(
-                        x: .fit(to: .chart),
-                        y: .disabled
+                        x: .fit(to: .automatic),
+                        y: .fit(to: .chart)
                     )
                 ) {
                     valueSelectionPopover
@@ -89,6 +95,10 @@ struct ExerciseChartView: View {
                 AxisGridLine()
                 AxisValueLabel(format: .dateTime.day())
             }
+        }
+        .chartYScale(domain: 0...yAxisMax)
+        .chartYAxis {
+            AxisMarks(position: .leading)
         }
     }
     

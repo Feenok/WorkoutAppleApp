@@ -81,15 +81,14 @@ class ExerciseDetailsViewModel: ObservableObject {
     }
     
     func getDuration(minutes: Int, seconds: Int) -> TimeInterval? {
-        /*
-        guard let min = Int(minutes), let sec = Int(seconds) else {
-            return nil
-        }
-        */
-        
         return TimeInterval(minutes * 60 + seconds)
     }
     
+    func secondsToMinutesAndSeconds(_ seconds: Int) -> (Int, Int) {
+        return (seconds / 60, seconds % 60)
+    }
+    
+    /*
     //UI FUNCTIONS
     func getPeakSetForDate(_ date: Date) -> ExerciseSet? {
         let dayStart = Calendar.current.startOfDay(for: date)
@@ -101,6 +100,9 @@ class ExerciseDetailsViewModel: ObservableObject {
             sets.max(by: { $0.weight < $1.weight })!
         }
     }
+     */
+    
+    
     
 }
 

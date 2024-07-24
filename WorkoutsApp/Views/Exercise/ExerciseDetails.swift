@@ -59,7 +59,7 @@ struct ExerciseDetails: View {
                         
                         //Show more data
                         
-                        if showingMoreData {
+                        if showingMoreData && vm.allSetsDictionary[displayedDateStart] != nil && !vm.allSetsDictionary[displayedDateStart]!.isEmpty {
                             MoreDataView(displayedDate: displayedDate, vm: vm, timedExercise: timedExercise, showingMoreData: $showingMoreData)
                         } else {
                             Button(action: {
@@ -381,7 +381,7 @@ struct MoreDataView: View {
                 .padding(.horizontal)
                 
                 Group {
-                    let (minutes, seconds) = secondsToMinutesAndSeconds(Int(totalDuration))
+                    let (minutes, seconds) = vm.secondsToMinutesAndSeconds(Int(totalDuration))
                     if minutes > 0 {
                         if seconds > 0 {
                         Text("The total duration of today's sets is ") +
@@ -413,10 +413,6 @@ struct MoreDataView: View {
             })
             .frame(maxWidth: .infinity, alignment: .center)
         }
-    }
-    
-    private func secondsToMinutesAndSeconds(_ seconds: Int) -> (Int, Int) {
-        return (seconds / 60, seconds % 60)
     }
     
 }
@@ -462,7 +458,7 @@ struct SetsByDateDetailsView: View {
                 
                 VStack(spacing: 0) {
                     ForEach(Array(sortedSets.enumerated()), id: \.element) { index, set in
-                        SetDetailRow(set: set, index: index, onDelete: {setToDelete = (set: set, index: index + 1)}, deletionEnabled: setDeletionEnabled)
+                        SetDetailRow(vm: vm, set: set, index: index, onDelete: {setToDelete = (set: set, index: index + 1)}, deletionEnabled: setDeletionEnabled)
                     }
                 }
                 .padding(.horizontal, 4)
@@ -495,6 +491,7 @@ struct SetsByDateDetailsView: View {
 }
 
 struct SetDetailRow: View {
+    let vm: ExerciseDetailsViewModel
     let set: ExerciseSet
     let index: Int
     let onDelete: () -> Void
@@ -512,6 +509,10 @@ struct SetDetailRow: View {
                     .padding(.trailing, -5)
                 Text("\(index+1)")
                     .foregroundStyle(.primary)
+                
+                //Add duration if available
+                durationView
+                
                 Spacer()
                 HStack {
                     Text("\(set.weight)")
@@ -548,4 +549,47 @@ struct SetDetailRow: View {
         }
         .padding(.top, 8)
     }
+    
+    @ViewBuilder
+    private var durationView: some View {
+        if let duration = set.duration {
+            let (minutes, seconds) = vm.secondsToMinutesAndSeconds(Int(duration))
+            HStack {
+                Image(systemName: "stopwatch.fill")
+                    .foregroundStyle(.gray)
+                    .font(.caption)
+                    .padding(.trailing, -5)
+                DurationView(minutes: minutes, seconds: seconds)
+            }
+        }
+    }
+    
 }
+
+struct DurationView: View {
+    let minutes: Int
+    let seconds: Int
+    
+    var body: some View {
+        Group {
+            if minutes > 0 {
+                if seconds > 0 {
+                    Text("\(minutes)").bold() +
+                    Text(" min ") +
+                    Text("\(seconds)").bold() +
+                    Text(" sec")
+                } else {
+                    Text("\(minutes)").bold() +
+                    Text(" min")
+                }
+            } else {
+                Text("\(seconds)").bold() +
+                Text(" sec")
+            }
+        }
+        .foregroundStyle(.gray)
+        .font(.caption)
+    }
+}
+
+
