@@ -13,6 +13,7 @@ struct ExerciseList: View {
     @Query private var exercises: [Exercise]
     
     @State private var newExercise: Exercise?
+    @State private var exerciseToEdit: Exercise?
     
     init(exerciseFilter: String = "") {
         let predicate = #Predicate<Exercise> { exercise in
@@ -27,11 +28,12 @@ struct ExerciseList: View {
             if !exercises.isEmpty {
                 List {
                     ForEach(exercises) { exercise in
-                        NavigationLink {
-                            ExerciseDetails(exercise: exercise)
-                        } label: {
-                            Text(exercise.name)
-                        }
+                        ExerciseRow(
+                            exercise: exercise,
+                            onLongPress: {
+                                exerciseToEdit = exercise
+                            }
+                        )
                     }
                     .onDelete(perform: deleteExercises)
                 }
@@ -56,6 +58,12 @@ struct ExerciseList: View {
             }
             .interactiveDismissDisabled()
         }
+        .sheet(item: $exerciseToEdit) { exercise in
+            NavigationStack {
+                EditExercise(exercise: exercise)
+            }
+            .interactiveDismissDisabled()
+        }
     }
 
     private func addExercise() {
@@ -73,9 +81,31 @@ struct ExerciseList: View {
             }
         }
     }
+    
 }
 
-#Preview {
-    ExerciseList()
-        .modelContainer(for: Exercise.self, inMemory: true)
+
+struct ExerciseRow: View {
+    let exercise: Exercise
+    let onLongPress: () -> Void
+    
+    @State private var isPressed = false
+    @GestureState private var longPress = false
+    
+    var body: some View {
+        NavigationLink(destination: ExerciseDetails(exercise: exercise)) {
+            Text(exercise.name)
+        }
+        .simultaneousGesture(
+            LongPressGesture(minimumDuration: 0.5)
+                .updating($longPress) { currentState, gestureState, _ in
+                    gestureState = currentState
+                }
+                .onEnded { _ in
+                    onLongPress()
+                }
+        )
+        .scaleEffect(longPress ? 0.95 : 1.0)
+        .animation(.easeInOut(duration: 0.2), value: longPress)
+    }
 }

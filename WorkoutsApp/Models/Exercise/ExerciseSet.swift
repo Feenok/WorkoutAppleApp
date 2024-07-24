@@ -15,7 +15,7 @@ final class ExerciseSet: Identifiable {
     var weight: Int
     var reps: Int
     var duration: TimeInterval?
-    var date: Date
+    /*@Attribute(.unique) */ var date: Date
     @Relationship(inverse: \Exercise.allSets) var exercise: Exercise?
     
     init(weight: Int, reps: Int, duration: TimeInterval? = nil, date: Date = Date(), exercise: Exercise? = nil) {

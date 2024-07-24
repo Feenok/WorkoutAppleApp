@@ -142,3 +142,37 @@ struct ExerciseChartView: View {
     
 }
 
+//TODO: Switching to date indexing
+/*
+ struct ExerciseChartView: View {
+     @ObservedObject var viewModel: ExerciseDetailsViewModel
+     
+     var body: some View {
+         Chart {
+             ForEach(viewModel.chartData.sorted(by: { $0.key < $1.key }), id: \.key) { date, weight in
+                 BarMark(
+                     x: .value("Date", date, unit: .day),
+                     y: .value("Weight", weight)
+                 )
+             }
+         }
+         .chartScrollableAxes(.horizontal)
+         .chartScrollPosition(x: .trailing)
+         .chartScrollTargetBehavior(
+             .valueAligned(
+                 matching: DateComponents(day: 1),
+                 majorAlignment: .matching(.init(day: 1, month: 1))
+             )
+         )
+         .onAppear {
+             viewModel.loadChartData(startDate: Calendar.current.date(byAdding: .month, value: -3, to: Date())!, endDate: Date())
+         }
+         .onChange(of: viewModel.chartData) { oldValue, newValue in
+             if let earliestDate = newValue.keys.min() {
+                 viewModel.loadMoreDataIfNeeded(for: earliestDate)
+             }
+         }
+     }
+ }
+ 
+ */

@@ -13,6 +13,9 @@ class ExerciseDetailsViewModel: ObservableObject {
     @Published var exercise: Exercise
     @Published var allSetsDictionary: [Date: [ExerciseSet]] = [:] // Dictionary to hold all sets per day
     
+    @Published var chartData: [Date: Int] = [:]
+    private var loadedDateRange: ClosedRange<Date>?
+    
     init(exercise: Exercise) {
         self.exercise = exercise
         initializeSetsDictionary()
@@ -102,7 +105,34 @@ class ExerciseDetailsViewModel: ObservableObject {
     }
      */
     
+    //TODO: IMPLEMENT DATA INDEX FOR CHART
+    /*
+    // Chart Functions
+    func loadChartData(startDate: Date, endDate: Date) {
+        let descriptor = FetchDescriptor<ExerciseSet>(
+            predicate: #Predicate { $0.date >= startDate && $0.date <= endDate },
+            sortBy: [SortDescriptor(\.date)]
+        )
+        let sets = try? modelContext.fetch(descriptor)
+        let newData = Dictionary(grouping: sets ?? [], by: { Calendar.current.startOfDay(for: $0.date) })
+            .mapValues { $0.map(\.weight).max() ?? 0 }
+        
+        chartData.merge(newData) { _, new in new }
+        loadedDateRange = startDate...endDate
+    }
     
+    func loadMoreDataIfNeeded(for date: Date) {
+        guard let loadedRange = loadedDateRange else {
+            loadChartData(startDate: date, endDate: Date())
+            return
+        }
+        
+        if date < loadedRange.lowerBound {
+            let newStartDate = Calendar.current.date(byAdding: .month, value: -3, to: loadedRange.lowerBound)!
+            loadChartData(startDate: newStartDate, endDate: loadedRange.lowerBound)
+        }
+    }
+     */
     
 }
 

@@ -18,11 +18,16 @@ struct ContentView: View {
                 .tabItem {
                     Label("Workouts", systemImage: "list.bullet.circle.fill")
                 }
+            DailyExerciseView()
+                .tabItem {
+                    Label("Daily Workout", systemImage: "figure.strengthtraining.traditional")
+                }
             StopwatchView()
                 .tabItem {
                     Label("Stopwatch", systemImage: "fitness.timer.fill")
                 }
         }
+        /*
         .onAppear {
             let appearance = UITabBarAppearance()
             appearance.configureWithTransparentBackground()
@@ -34,5 +39,6 @@ struct ContentView: View {
                 UITabBar.appearance().scrollEdgeAppearance = appearance
             }
         }
+        */
     }
 }
