@@ -7,18 +7,13 @@
 
 import SwiftUI
 
-import SwiftUI
-
 struct FilteredWorkoutList: View {
     @State private var searchText = ""
     
     var body: some View {
-        NavigationSplitView {
+        NavigationStack {
             WorkoutList(workoutFilter: searchText)
                 .searchable(text: $searchText)
-        } detail: {
-            Text("Search workouts")
-                .navigationTitle("Workouts")
         }
     }
 }

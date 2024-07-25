@@ -1,10 +1,12 @@
 //
-//  ExerciseDetailsViewModel.swift
+//  ViewModels.swift
 //  WorkoutsApp
 //
-//  Created by Ernest Margariti on 7/13/24.
+//  Created by Ernest Margariti on 7/25/24.
 //
 
+/*
+ 
 import Foundation
 import Combine
 import SwiftUI
@@ -19,7 +21,6 @@ class ExerciseDetailsViewModel: ObservableObject {
     init(exercise: Exercise) {
         self.exercise = exercise
         initializeSetsDictionary()
-        updatePRSet()
     }
     
     private func initializeSetsDictionary() {
@@ -38,7 +39,7 @@ class ExerciseDetailsViewModel: ObservableObject {
         addSetToSetsDictionary(newSet)
         
         // Update Exercise Stats
-        updatePRSet()
+        updatePRSet(newSet: newSet)
     }
     
     private func addSetToSetsDictionary(_ newSet: ExerciseSet) {
@@ -51,17 +52,10 @@ class ExerciseDetailsViewModel: ObservableObject {
         }
     }
     
-    func updatePRSet() {
-        let newPRSet = allSetsDictionary.values
-            .flatMap { $0 }
-            .max { a, b in
-                if a.weight == b.weight {
-                    return a.reps < b.reps
-                }
-                return a.weight < b.weight
-            }
-        
-        exercise.PRSet = newPRSet
+    private func updatePRSet(newSet: ExerciseSet) {
+        if exercise.PRSet == nil || newSet.weight > exercise.PRSet?.weight ?? 0 || (newSet.weight == exercise.PRSet?.weight ?? 0 && newSet.reps > exercise.PRSet?.reps ?? 0) {
+            exercise.PRSet = newSet
+        }
     }
     
     func findLatestSet(consideringLast count: Int = 100) -> ExerciseSet? {
@@ -85,7 +79,10 @@ class ExerciseDetailsViewModel: ObservableObject {
             }
         }
         
-        updatePRSet()
+        // Update PRSet if necessary
+        if exercise.PRSet?.id == set.id {
+            exercise.PRSet = exercise.allSets.max(by: { $0.weight < $1.weight })
+        }
     }
     
     func getDuration(minutes: Int, seconds: Int) -> TimeInterval? {
@@ -95,49 +92,7 @@ class ExerciseDetailsViewModel: ObservableObject {
     func secondsToMinutesAndSeconds(_ seconds: Int) -> (Int, Int) {
         return (seconds / 60, seconds % 60)
     }
-    
-    /*
-    //UI FUNCTIONS
-    func getPeakSetForDate(_ date: Date) -> ExerciseSet? {
-        let dayStart = Calendar.current.startOfDay(for: date)
-        return allSetsDictionary[dayStart]?.max(by: { $0.weight < $1.weight })
-    }
-    
-    func getAllPeakSets() -> [Date: ExerciseSet] {
-        return allSetsDictionary.mapValues { sets in
-            sets.max(by: { $0.weight < $1.weight })!
-        }
-    }
-     */
-    
-    //TODO: IMPLEMENT DATA INDEX FOR CHART
-    /*
-    // Chart Functions
-    func loadChartData(startDate: Date, endDate: Date) {
-        let descriptor = FetchDescriptor<ExerciseSet>(
-            predicate: #Predicate { $0.date >= startDate && $0.date <= endDate },
-            sortBy: [SortDescriptor(\.date)]
-        )
-        let sets = try? modelContext.fetch(descriptor)
-        let newData = Dictionary(grouping: sets ?? [], by: { Calendar.current.startOfDay(for: $0.date) })
-            .mapValues { $0.map(\.weight).max() ?? 0 }
-        
-        chartData.merge(newData) { _, new in new }
-        loadedDateRange = startDate...endDate
-    }
-    
-    func loadMoreDataIfNeeded(for date: Date) {
-        guard let loadedRange = loadedDateRange else {
-            loadChartData(startDate: date, endDate: Date())
-            return
-        }
-        
-        if date < loadedRange.lowerBound {
-            let newStartDate = Calendar.current.date(byAdding: .month, value: -3, to: loadedRange.lowerBound)!
-            loadChartData(startDate: newStartDate, endDate: loadedRange.lowerBound)
-        }
-    }
-     */
-    
 }
+
+*/
 

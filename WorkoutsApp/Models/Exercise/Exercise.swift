@@ -12,8 +12,8 @@ import SwiftData
 final class Exercise {
     var name: String
     var category: String
-    var PRSet: ExerciseSet? //Personal Record Set
     @Relationship(deleteRule: .cascade) var allSets: [ExerciseSet] = []
+    var PRSet: ExerciseSet? // Personal Record set
     
     init(name: String, category: String) {
             self.name = name

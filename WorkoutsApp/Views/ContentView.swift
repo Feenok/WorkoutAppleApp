@@ -18,27 +18,19 @@ struct ContentView: View {
                 .tabItem {
                     Label("Workouts", systemImage: "list.bullet.circle.fill")
                 }
-            DailyExerciseView()
-                .tabItem {
-                    Label("Daily Workout", systemImage: "figure.strengthtraining.traditional")
-                }
-            StopwatchView()
-                .tabItem {
-                    Label("Stopwatch", systemImage: "fitness.timer.fill")
-                }
-        }
-        /*
-        .onAppear {
-            let appearance = UITabBarAppearance()
-            appearance.configureWithTransparentBackground()
-            appearance.backgroundEffect = UIBlurEffect(style: .systemUltraThinMaterial) // Customize the blur effect style
+            NavigationStack {
+                DailyExerciseView()
+            }
+            .tabItem {
+                Label("Daily Workout", systemImage: "figure.strengthtraining.traditional")
+            }
+            NavigationStack {
+                StopwatchView()
+            }
             
-            // Apply the appearance to the tabBar
-            UITabBar.appearance().standardAppearance = appearance
-            if #available(iOS 15.0, *) {
-                UITabBar.appearance().scrollEdgeAppearance = appearance
+            .tabItem {
+                Label("Stopwatch", systemImage: "fitness.timer.fill")
             }
         }
-        */
     }
 }

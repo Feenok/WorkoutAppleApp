@@ -40,8 +40,9 @@ struct ExerciseDetails: View {
                 ScrollView {
                     VStack {
                         //Personal best set
-                        ExerciseSetView(exerciseSet: vm.exercise.PRSet!, setType: .greatest)
-                        
+                        if let prSet = vm.exercise.PRSet {
+                            ExerciseSetView(exerciseSet: prSet, setType: .greatest)
+                        }
                         //Chart
                         Group {
                             ExerciseChartView(sets: vm.allSetsDictionary, rawSelectedDate: $selectedDate)
@@ -300,7 +301,7 @@ struct ExerciseSetView: View {
             }
             .padding(6)
             .background {
-                RoundedRectangle(cornerRadius: 4)
+                RoundedRectangle(cornerRadius: 8)
                     .foregroundStyle(Color.gray.opacity(0.12))
             }
         }

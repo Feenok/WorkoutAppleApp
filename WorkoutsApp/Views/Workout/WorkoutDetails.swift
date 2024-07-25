@@ -21,6 +21,14 @@ struct WorkoutDetails: View {
         workout.templateSets.sorted { $0.date < $1.date }
     }
     
+    private var editButton: some View {
+        Button(isEditing ? "Done" : "Edit") {
+            withAnimation {
+                isEditing.toggle()
+            }
+        }
+    }
+    
     var body: some View {
         Group {
             if !workout.templateSets.isEmpty {
@@ -35,15 +43,7 @@ struct WorkoutDetails: View {
             }
         }
         .navigationTitle("Workout Plan")
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button(isEditing ? "Done" : "Edit") {
-                    withAnimation {
-                        isEditing.toggle()
-                    }
-                }
-            }
-        }
+        .navigationBarItems(trailing: editButton)
         .sheet(item: $newWorkoutTemplateSet) { set in
             NavigationStack {
                 EnterWorkoutSet(workout: workout, newWorkoutTemplateSet: set)
@@ -80,34 +80,86 @@ struct WorkoutDetails: View {
         List {
             ForEach(sortedSets) {set in
                 VStack {
-                    Text("\(set.name)")
+                    Text("\(set.name)".uppercased())
+                        .foregroundStyle(.secondary)
+                        .font(.caption2)
+                        .padding(.horizontal)
+                        .padding(.bottom, -4)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                     if isEditing {
                         HStack {
                             TextField("Weight", value: Binding(
                                 get: { set.targetWeight },
                                 set: { set.targetWeight = $0 }
                             ), formatter: NumberFormatter())
+                            .multilineTextAlignment(.center)
+                            .frame(width: 50)
+                            .padding(.vertical, -1)
+                            .padding(.trailing, 3)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .stroke(Color.secondary, lineWidth: 1)  // Border around the TextField
+                            )
                             .keyboardType(.numberPad)
                             Text("LBS")
+                                .foregroundStyle(.secondary)
+                                .font(.caption)
+                                
                             Spacer()
                             TextField("Reps", value: Binding(
                                 get: { set.targetReps },
                                 set: { set.targetReps = $0 }
                             ), formatter: NumberFormatter())
+                            .multilineTextAlignment(.center)
+                            .frame(width: 50)
+                            .padding(.vertical, -1)
+                            .padding(.trailing, 3)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .stroke(Color.secondary, lineWidth: 1)  // Border around the TextField
+                            )
                             .keyboardType(.numberPad)
                             Text("REPS")
+                                .foregroundStyle(.secondary)
+                                .font(.caption)
+                                
+                        }
+                        .transition(.blurReplace)
+                        .padding()
+                        .background {
+                            RoundedRectangle(cornerRadius: 16)
+                                .foregroundStyle(Color.secondary.opacity(0.2))
                         }
                     } else {
                         HStack {
-                            Text("Weight: \(set.targetWeight) LBS")
+                            Text("\(set.targetWeight)")
+                                .font(.body)
+                                
+                            Text(" LBS")
+                                .foregroundStyle(.secondary)
+                                .font(.caption)
+                                
                             Spacer()
-                            Text("Reps: \(set.targetReps) REPS")
+                            Text("\(set.targetReps)")
+                                .font(.body)
+                                
+                            Text(" REPS")
+                                .foregroundStyle(.secondary)
+                                .font(.caption)
+                        }
+                        .transition(.blurReplace)
+                        .padding()
+                        .background {
+                            RoundedRectangle(cornerRadius: 16)
+                                .foregroundStyle(Color.secondary.opacity(0.2))
                         }
                     }
                 }
+                .listRowSeparator(.hidden)
             }
             .onDelete(perform: isEditing ? deleteWorkoutSets : nil)
         }
+        .listStyle(PlainListStyle())
         
         if isEditing {
             Button(action: addWorkoutSet) {
