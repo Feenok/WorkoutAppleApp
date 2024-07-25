@@ -15,19 +15,47 @@ struct ExerciseList: View {
     @State private var newExercise: Exercise?
     @State private var exerciseToEdit: Exercise?
     
+    @State private var selectedCategory: ExerciseCategory?
+    //@State private var showingCategoryPicker = false
+    @State private var isDropdownVisible = false
+    
+    let exerciseFilter: String
+    
     init(exerciseFilter: String = "") {
+        self.exerciseFilter = exerciseFilter
         let predicate = #Predicate<Exercise> { exercise in
             exerciseFilter.isEmpty || exercise.name.localizedStandardContains(exerciseFilter)
         }
-        
         _exercises = Query(filter: predicate, sort: \Exercise.name)
+    }
+    
+    private var filteredExercises: [Exercise] {
+        guard let selectedCategory = selectedCategory else {
+            return exercises
+        }
+        return exercises.filter { $0.category == selectedCategory }
+    }
+    
+    private var categoryFilterButtons: [ActionSheet.Button] {
+        var buttons = [
+            ActionSheet.Button.default(Text("All")) {
+                selectedCategory = nil
+            }
+        ]
+        buttons += ExerciseCategory.allCases.map { category in
+            ActionSheet.Button.default(Text(category.rawValue.capitalized)) {
+                selectedCategory = category
+            }
+        }
+        buttons.append(.cancel())
+        return buttons
     }
 
     var body: some View {
         Group {
             if !exercises.isEmpty {
                 List {
-                    ForEach(exercises) { exercise in
+                    ForEach(filteredExercises) { exercise in
                         ExerciseRow(
                             exercise: exercise,
                             onLongPress: {
@@ -39,7 +67,7 @@ struct ExerciseList: View {
                 }
             } else {
                 ContentUnavailableView {
-                    Label("Add Exercise", systemImage: "film.stack")
+                    Label("Add Exercise", systemImage: "plus.app")
                 }
             }
         }
@@ -47,10 +75,25 @@ struct ExerciseList: View {
         .toolbar {
             ToolbarItem {
                 Button(action: addExercise) {
-                    Text("Add Exercise")
+                    Image(systemName: "plus")
                         .foregroundStyle(.blue)
                 }
             }
+            ToolbarItem(placement: .navigationBarTrailing) {
+                        Menu {
+                            Button(action: { selectedCategory = nil }) {
+                                Label("All", systemImage: selectedCategory == nil ? "checkmark" : "")
+                            }
+                            ForEach(ExerciseCategory.allCases) { category in
+                                Button(action: { selectedCategory = category }) {
+                                    Label(category.rawValue.capitalized, systemImage: selectedCategory == category ? "checkmark" : "")
+                                }
+                            }
+                        } label: {
+                            Image(systemName: "line.3.horizontal.decrease.circle")
+                                .foregroundStyle(selectedCategory != nil ? .blue : .primary)
+                        }
+                    }
         }
         .sheet(item: $newExercise) { exercise in
             NavigationStack {
@@ -68,9 +111,8 @@ struct ExerciseList: View {
 
     private func addExercise() {
         withAnimation {
-            let newItem = Exercise(name: "", category: "")
-            modelContext.insert(newItem)
-            newExercise = newItem
+            newExercise = Exercise(name: "", category: ExerciseCategory.misc)
+            modelContext.insert(newExercise!)
         }
     }
 
@@ -107,5 +149,30 @@ struct ExerciseRow: View {
         )
         .scaleEffect(longPress ? 0.95 : 1.0)
         .animation(.easeInOut(duration: 0.2), value: longPress)
+    }
+}
+
+
+struct CategoryDropdown: View {
+    let categories: [ExerciseCategory?]
+    @Binding var selectedCategory: ExerciseCategory?
+    var onDismiss: () -> Void
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            ForEach(categories, id: \.self) { category in
+                Button(action: {
+                    selectedCategory = category
+                    onDismiss()
+                }) {
+                    Text(category?.rawValue.capitalized ?? "All")
+                        .foregroundColor(selectedCategory == category ? .blue : .primary)
+                }
+            }
+        }
+        .padding()
+        .background(Color(UIColor.systemBackground))
+        .cornerRadius(8)
+        .shadow(radius: 4)
     }
 }

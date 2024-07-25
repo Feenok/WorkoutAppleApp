@@ -21,6 +21,12 @@ struct EnterExercise: View {
     var body: some View {
         Form {
             TextField("Exercise name", text: $exercise.name)
+            Picker("Category", selection: $exercise.category) {
+                Text("Choose a category").tag("")
+                ForEach(ExerciseCategory.allCases) { category in
+                    Text(category.rawValue.capitalized).tag(category)
+                }
+            }
         }
         .navigationTitle("Add Exercise")
         .toolbar{
@@ -37,5 +43,6 @@ struct EnterExercise: View {
             }
         }
     }
-    
+
 }
+

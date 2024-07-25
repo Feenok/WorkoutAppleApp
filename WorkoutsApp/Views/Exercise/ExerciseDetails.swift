@@ -27,6 +27,12 @@ struct ExerciseDetails: View {
     @State private var insetExpanded = false // Check if inset for adding a set is expanded
     @State private var timedExercise = false // Check if exercise has a duration
     
+    @State private var setDeletionEnabled: Bool = false
+    
+    private var hasSetsForDate: Bool {
+        let dayStart = Calendar.current.startOfDay(for: displayedDate)
+        return !(vm.allSetsDictionary[dayStart]?.isEmpty ?? true)
+    }
     
     init(exercise: Exercise) {
         _vm = ObservedObject(wrappedValue: ExerciseDetailsViewModel(exercise: exercise))
@@ -75,7 +81,7 @@ struct ExerciseDetails: View {
                         }
                         
                         //Daily Set list
-                        SetsByDateDetailsView(displayedDate: displayedDate, vm: vm)
+                        SetsByDateDetailsView(displayedDate: displayedDate, insetExpanded: $insetExpanded, vm: vm, setDeletionEnabled: $setDeletionEnabled)
                     }
                 }
             }
@@ -90,14 +96,13 @@ struct ExerciseDetails: View {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: {
                     withAnimation {
-                        insetExpanded.toggle()
+                        setDeletionEnabled.toggle()
                     }
                 }) {
-                    Text("Add Set")
-                        .foregroundStyle(insetExpanded ? .gray : .blue)
-                        .opacity(insetExpanded ? 0.5 : 1.0)
-                }
-                .disabled(insetExpanded)
+                    Text(setDeletionEnabled ? "Cancel" : "Delete Set")
+                        .foregroundStyle(hasSetsForDate ? .red : .gray)
+                }.disabled(!hasSetsForDate)
+                
             }
         }
         .safeAreaInset(edge: .bottom) {
@@ -421,18 +426,15 @@ struct MoreDataView: View {
 
 struct SetsByDateDetailsView: View {
     var displayedDate: Date
+    @Binding var insetExpanded: Bool
     @ObservedObject var vm: ExerciseDetailsViewModel
     
-    @State private var setDeletionEnabled: Bool = false
+    @Binding var setDeletionEnabled: Bool
     @State private var setToDelete: (set: ExerciseSet, index: Int)?
+     
     
     let padding: CGFloat = -4
     
-    private var hasSetsForDate: Bool {
-            let dayStart = Calendar.current.startOfDay(for: displayedDate)
-            return !(vm.allSetsDictionary[dayStart]?.isEmpty ?? true)
-        }
-
     var body: some View {
         VStack {
             HStack {
@@ -442,14 +444,17 @@ struct SetsByDateDetailsView: View {
                     .fontWeight(.bold)
                     .padding(.vertical, 8)
                 
-                if hasSetsForDate {
-                    Button(action: {
-                        setDeletionEnabled.toggle()
-                    }, label: {
-                        Text(setDeletionEnabled ? "Cancel" : "Delete Set")
-                            .foregroundStyle(.red)
-                    })
+                Button(action: {
+                    withAnimation {
+                        insetExpanded.toggle()
+                    }
+                }) {
+                    Text("Add Set")
+                        .foregroundStyle(insetExpanded ? .gray : .blue)
+                        .opacity(insetExpanded ? 0.5 : 1.0)
                 }
+                .disabled(insetExpanded)
+                
             }
 
             let dayStart = Calendar.current.startOfDay(for: displayedDate)
