@@ -35,16 +35,26 @@ struct WorkoutDetails: View {
             if !workout.templateSets.isEmpty {
                 workoutList
             } else {
-                ContentUnavailableView {
+                VStack {
+                    Spacer()
+                    Text("No Exercises")
+                        .bold()
+                    Spacer()
                     Button(action: addWorkoutSet) {
-                        Text("Add Set")
-                            .foregroundStyle(.blue)
+                        HStack (spacing: 5) {
+                            Image(systemName: "plus")
+                            Text("Add Exercise")
+                        }
+                        .foregroundStyle(.blue)
+                        .font(.body)
+                        .bold()
+                        .padding(.bottom, 20)
                     }
                 }
             }
         }
         .navigationTitle("Workout Plan")
-        .navigationBarItems(trailing: editButton)
+        .navigationBarItems(trailing: !workout.templateSets.isEmpty ? editButton : nil)
         .sheet(item: $newWorkoutTemplateSet) { set in
             NavigationStack {
                 EnterWorkoutSet(workout: workout, newWorkoutTemplateSet: set)
@@ -85,14 +95,17 @@ struct WorkoutDetails: View {
     @ViewBuilder
     private var workoutList: some View {
         List {
-            ForEach(sortedSets) {set in
+            ForEach(Array(sortedSets.enumerated()), id: \.element.id) { index, set in
                 VStack {
-                    Text("\(set.name)".uppercased())
-                        .foregroundStyle(.secondary)
-                        .font(.caption2)
-                        .padding(.horizontal)
-                        .padding(.bottom, -4)
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                    HStack (spacing: 2) {
+                        Text("\(index + 1).")
+                        Text("\(set.name)".uppercased())
+                    }
+                    .foregroundStyle(.secondary)
+                    .font(.caption2)
+                    .padding(.horizontal)
+                    .padding(.bottom, -4)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                     if isEditing {
                         HStack {
                             TextField("Weight", value: Binding(
@@ -158,16 +171,20 @@ struct WorkoutDetails: View {
                         .padding()
                         .background {
                             RoundedRectangle(cornerRadius: 16)
-                                .foregroundStyle(Color.secondary.opacity(0.2))
+                                //.foregroundStyle(Color.secondary.opacity(0.2))
+                                .fill(selectedSetIDs.contains(set.id) ? Color.blue.opacity(0.6) : Color.secondary.opacity(0.2))
                         }
                     }
                 }
                 .listRowSeparator(.hidden)
+                .listRowBackground(Color.clear)
+                /*
                 .listRowBackground(
                     selectedSetIDs.contains(set.id) ?
                     Color.blue.opacity(0.1) :
                         Color.clear
                 )
+                 */
                 .contentShape(Rectangle())
                 .onTapGesture {
                     if !isEditing {

@@ -16,7 +16,6 @@ struct FilteredExerciseList: View {
                 .searchable(text: $searchText)
         } detail: {
             Text("Search exercises")
-                //.navigationTitle("Exercises2")
         }
     }
 }

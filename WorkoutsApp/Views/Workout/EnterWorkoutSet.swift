@@ -36,7 +36,7 @@ struct EnterWorkoutSet: View {
                 Text("reps")
             }
         }
-        .navigationTitle("Add Set to Workout")
+        .navigationTitle("Add Exercise Set")
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
                 Button("Add") {

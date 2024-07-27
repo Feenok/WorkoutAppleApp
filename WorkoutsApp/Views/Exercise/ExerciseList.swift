@@ -35,6 +35,14 @@ struct ExerciseList: View {
         return exercises.filter { $0.category == selectedCategory }
     }
     
+    private var title: String {
+        if !exercises.isEmpty {
+            return selectedCategory?.rawValue.capitalized ?? "All Exercises"
+        } else {
+            return "Exercises"
+        }
+    }
+    
     var body: some View {
         Group {
             if !exercises.isEmpty {
@@ -50,34 +58,50 @@ struct ExerciseList: View {
                     .onDelete(perform: deleteExercises)
                 }
             } else {
-                ContentUnavailableView {
-                    Label("Add Exercise", systemImage: "plus.app")
+                VStack {
+                    Spacer()
+                    Text("No Exercises")
+                        .bold()
+                    Spacer()
+                    Button(action: addExercise) {
+                        HStack (spacing: 5) {
+                            Image(systemName: "plus")
+                            Text("Add Exercise")
+                        }
+                        .foregroundStyle(.blue)
+                        .font(.body)
+                        .bold()
+                        .padding(.bottom, 20)
+                    }
                 }
             }
         }
-        .navigationTitle(selectedCategory == nil ? "All Exercises" : selectedCategory!.rawValue.capitalized)
+        .navigationTitle(title)
         .toolbar {
-            ToolbarItem {
-                Button(action: addExercise) {
-                    Image(systemName: "plus")
-                        .foregroundStyle(.blue)
+            if !exercises.isEmpty {
+                ToolbarItem {
+                    Button(action: addExercise) {
+                        Image(systemName: "plus")
+                            .foregroundStyle(.blue)
+                    }
+                }
+                
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Menu {
+                        Button(action: { selectedCategory = nil }) {
+                            Label("All", systemImage: selectedCategory == nil ? "checkmark" : "")
+                        }
+                        ForEach(ExerciseCategory.allCases) { category in
+                            Button(action: { selectedCategory = category }) {
+                                Label(category.rawValue.capitalized, systemImage: selectedCategory == category ? "checkmark" : "")
+                            }
+                        }
+                    } label: {
+                        Image(systemName: "line.3.horizontal.decrease.circle")
+                            .foregroundStyle(.blue)
+                    }
                 }
             }
-            ToolbarItem(placement: .navigationBarTrailing) {
-                        Menu {
-                            Button(action: { selectedCategory = nil }) {
-                                Label("All", systemImage: selectedCategory == nil ? "checkmark" : "")
-                            }
-                            ForEach(ExerciseCategory.allCases) { category in
-                                Button(action: { selectedCategory = category }) {
-                                    Label(category.rawValue.capitalized, systemImage: selectedCategory == category ? "checkmark" : "")
-                                }
-                            }
-                        } label: {
-                            Image(systemName: "line.3.horizontal.decrease.circle")
-                                .foregroundStyle(.blue)
-                        }
-                    }
         }
         .sheet(item: $newExercise) { exercise in
             NavigationStack {

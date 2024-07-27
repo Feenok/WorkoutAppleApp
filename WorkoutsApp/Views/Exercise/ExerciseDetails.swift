@@ -90,40 +90,48 @@ struct ExerciseDetails: View {
                 }
             }
             else {
-                ContentUnavailableView {
-                    VStack {
-                        //Additional exercise info
-                        AdditionalExerciseInfoView(vm: vm, showingInfo: $showingInfo)
-                        
-                        Spacer()
-                        Button(action: {
-                            withAnimation {
-                                insetExpanded.toggle()
-                            }
-                        }) {
-                            Text("Add Set")
-                                .font(.title)
-                                .foregroundStyle(insetExpanded ? .gray : .blue)
-                                .opacity(insetExpanded ? 0.5 : 1.0)
+                VStack {
+                    Text("\(vm.exercise.info)")
+                        .font(.body)
+                        .padding()
+                    Spacer()
+                    Text("No Sets")
+                        .bold()
+                    Spacer()
+                    
+                    Button(action: {
+                        withAnimation {
+                            insetExpanded.toggle()
                         }
-                        .disabled(insetExpanded)
-                        Spacer()
+                    }) {
+                        HStack (spacing: 5) {
+                            Image(systemName: "plus")
+                            Text("Add Set")
+                        }
+                        .foregroundStyle(.blue)
+                        .font(.body)
+                        .bold()
+                        .padding(.bottom, 20)
+                        .foregroundStyle(insetExpanded ? .gray : .blue)
+                        .opacity(insetExpanded ? 0.5 : 1.0)
                     }
+                    .disabled(insetExpanded)
                 }
             }
         }
         .navigationTitle("\(vm.exercise.name)")
         .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button(action: {
-                    withAnimation {
-                        setDeletionEnabled.toggle()
+            if hasSetsForDate {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: {
+                        withAnimation {
+                            setDeletionEnabled.toggle()
+                        }
+                    }) {
+                        Text(setDeletionEnabled ? "Cancel" : "Delete Set")
+                            .foregroundStyle(.red)
                     }
-                }) {
-                    Text(setDeletionEnabled ? "Cancel" : "Delete Set")
-                        .foregroundStyle(hasSetsForDate ? .red : .gray)
-                }.disabled(!hasSetsForDate)
-                
+                }
             }
         }
         .safeAreaInset(edge: .bottom) {
@@ -646,6 +654,7 @@ struct AdditionalExerciseInfoView: View {
                 }) {
                     Text("Collapse Exercise Info")
                         .font(.body)
+                        .padding()
                 }
             }
         }

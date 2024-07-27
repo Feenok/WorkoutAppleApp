@@ -37,8 +37,13 @@ struct EditExercise: View {
                 VStack(alignment: .leading) {
                     Text("Exercise Info")
                         .frame(width: .infinity, alignment: .leading)
-                    TextField("Add additional info", text: $editedInfo)
-                        .frame(width: .infinity, height: 300, alignment: .topLeading)
+                    TextEditor(text: $editedInfo)
+                        .frame(height: 200)
+                        .foregroundColor(.gray)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 8)
+                                .stroke(Color.gray.opacity(0.2), lineWidth: 1)
+                        )
                 }
             }
         }

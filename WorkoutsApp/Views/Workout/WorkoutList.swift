@@ -36,17 +36,32 @@ struct WorkoutList: View {
                     .onDelete(perform: deleteWorkouts)
                 }
             } else {
-                ContentUnavailableView {
-                    Label("Add Workout", systemImage: "film.stack")
+                VStack {
+                    Spacer()
+                    Text("No Workouts")
+                        .bold()
+                    Spacer()
+                    Button(action: addWorkout) {
+                        HStack (spacing: 5) {
+                            Image(systemName: "plus")
+                            Text("Add Workout")
+                        }
+                        .foregroundStyle(.blue)
+                        .font(.body)
+                        .bold()
+                        .padding(.bottom, 20)
+                    }
                 }
             }
         }
         .navigationTitle("Workouts")
         .toolbar {
-            ToolbarItem {
-                Button(action: addWorkout) {
-                    Text("Add Workout")
-                        .foregroundStyle(.blue)
+            if !workouts.isEmpty {
+                ToolbarItem {
+                    Button(action: addWorkout) {
+                        Text("Add Workout")
+                            .foregroundStyle(.blue)
+                    }
                 }
             }
         }
