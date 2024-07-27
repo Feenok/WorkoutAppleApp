@@ -14,22 +14,41 @@ struct EditExercise: View {
     @Environment(\.modelContext) private var modelContext
     
     @State private var editedName: String
-    //@State private var editedCategory: String
+    @State private var editedCategory: ExerciseCategory
+    @State private var editedInfo: String
     
     init(exercise : Exercise) {
         self.exercise = exercise
         _editedName = State(initialValue: exercise.name)
+        _editedCategory = State(initialValue: exercise.category)
+        _editedInfo = State(initialValue: exercise.info)
     }
     
     var body: some View {
-        Form {
-            TextField("Edit exercise name", text: $editedName)
+        Group {
+            Form {
+                TextField("Edit exercise name", text: $editedName)
+                Picker("Edit Category", selection: $editedCategory) {
+                    Text("Exercise Category").tag("")
+                    ForEach(ExerciseCategory.allCases) { category in
+                        Text(category.rawValue.capitalized).tag(category)
+                    }
+                }
+                VStack(alignment: .leading) {
+                    Text("Exercise Info")
+                        .frame(width: .infinity, alignment: .leading)
+                    TextField("Add additional info", text: $editedInfo)
+                        .frame(width: .infinity, height: 300, alignment: .topLeading)
+                }
+            }
         }
         .navigationTitle("Edit Exercise")
         .toolbar{
             ToolbarItem(placement: .confirmationAction) {
                 Button("Save") {
                     exercise.name = editedName
+                    exercise.category = editedCategory
+                    exercise.info = editedInfo
                     dismiss()
                 }
             }

@@ -11,13 +11,15 @@ struct ContentView: View {
     var body: some View {
         TabView  {
             FilteredExerciseList()
-                .tabItem {
-                    Label("Exercises", systemImage: "dumbbell.fill")
-                }
-            FilteredWorkoutList()
-                .tabItem {
-                    Label("Workouts", systemImage: "list.bullet.circle.fill")
-                }
+            .tabItem {
+                Label("Exercises", systemImage: "dumbbell.fill")
+            }
+            NavigationStack {
+                FilteredWorkoutList()
+            }
+            .tabItem {
+                Label("Workouts", systemImage: "list.bullet.circle.fill")
+            }
             NavigationStack {
                 DailyExerciseView()
             }
@@ -27,7 +29,6 @@ struct ContentView: View {
             NavigationStack {
                 StopwatchView()
             }
-            
             .tabItem {
                 Label("Stopwatch", systemImage: "fitness.timer.fill")
             }

@@ -14,13 +14,13 @@ enum ExerciseCategory: String, CaseIterable, Codable, Identifiable {
     case shoulders
     case biceps
     case triceps
-    case forearms
     case traps
-    case abs
-    case glutes
     case quads
     case hamstrings
+    case glutes
     case calves
+    case abs
+    case forearms
     case misc
     
     var id: String { self.rawValue }
@@ -30,8 +30,11 @@ enum ExerciseCategory: String, CaseIterable, Codable, Identifiable {
 final class Exercise {
     var name: String
     var category: ExerciseCategory
+    var info: String = ""
+    
     @Relationship(deleteRule: .cascade) var allSets: [ExerciseSet] = []
     var PRSet: ExerciseSet? // Personal Record set
+    
     
     init(name: String, category: ExerciseCategory) {
             self.name = name

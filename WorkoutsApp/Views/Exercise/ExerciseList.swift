@@ -16,7 +16,6 @@ struct ExerciseList: View {
     @State private var exerciseToEdit: Exercise?
     
     @State private var selectedCategory: ExerciseCategory?
-    //@State private var showingCategoryPicker = false
     @State private var isDropdownVisible = false
     
     let exerciseFilter: String
@@ -36,21 +35,6 @@ struct ExerciseList: View {
         return exercises.filter { $0.category == selectedCategory }
     }
     
-    private var categoryFilterButtons: [ActionSheet.Button] {
-        var buttons = [
-            ActionSheet.Button.default(Text("All")) {
-                selectedCategory = nil
-            }
-        ]
-        buttons += ExerciseCategory.allCases.map { category in
-            ActionSheet.Button.default(Text(category.rawValue.capitalized)) {
-                selectedCategory = category
-            }
-        }
-        buttons.append(.cancel())
-        return buttons
-    }
-
     var body: some View {
         Group {
             if !exercises.isEmpty {
@@ -71,7 +55,7 @@ struct ExerciseList: View {
                 }
             }
         }
-        .navigationTitle("Exercises")
+        .navigationTitle(selectedCategory == nil ? "All Exercises" : selectedCategory!.rawValue.capitalized)
         .toolbar {
             ToolbarItem {
                 Button(action: addExercise) {
@@ -91,7 +75,7 @@ struct ExerciseList: View {
                             }
                         } label: {
                             Image(systemName: "line.3.horizontal.decrease.circle")
-                                .foregroundStyle(selectedCategory != nil ? .blue : .primary)
+                                .foregroundStyle(.blue)
                         }
                     }
         }
@@ -135,7 +119,9 @@ struct ExerciseRow: View {
     @GestureState private var longPress = false
     
     var body: some View {
-        NavigationLink(destination: ExerciseDetails(exercise: exercise)) {
+        NavigationLink {
+            ExerciseDetails(exercise: exercise)
+        } label: {
             Text(exercise.name)
         }
         .simultaneousGesture(

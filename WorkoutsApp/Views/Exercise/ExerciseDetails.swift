@@ -28,6 +28,7 @@ struct ExerciseDetails: View {
     @State private var timedExercise = false // Check if exercise has a duration
     
     @State private var setDeletionEnabled: Bool = false
+    @State private var showingInfo = false
     
     private var hasSetsForDate: Bool {
         let dayStart = Calendar.current.startOfDay(for: displayedDate)
@@ -45,6 +46,9 @@ struct ExerciseDetails: View {
             if !vm.exercise.allSets.isEmpty {
                 ScrollView {
                     VStack {
+                        //Additional exercise info
+                        AdditionalExerciseInfoView(vm: vm, showingInfo: $showingInfo)
+                        
                         //Personal best set
                         if let prSet = vm.exercise.PRSet {
                             ExerciseSetView(exerciseSet: prSet, setType: .greatest)
@@ -87,12 +91,29 @@ struct ExerciseDetails: View {
             }
             else {
                 ContentUnavailableView {
-                    Label("Add Exercise Set", systemImage: "film.stack")
+                    VStack {
+                        //Additional exercise info
+                        AdditionalExerciseInfoView(vm: vm, showingInfo: $showingInfo)
+                        
+                        Spacer()
+                        Button(action: {
+                            withAnimation {
+                                insetExpanded.toggle()
+                            }
+                        }) {
+                            Text("Add Set")
+                                .font(.title)
+                                .foregroundStyle(insetExpanded ? .gray : .blue)
+                                .opacity(insetExpanded ? 0.5 : 1.0)
+                        }
+                        .disabled(insetExpanded)
+                        Spacer()
+                    }
                 }
             }
         }
-        .navigationTitle(vm.exercise.name)
-        .toolbar{
+        .navigationTitle("\(vm.exercise.name)")
+        .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: {
                     withAnimation {
@@ -598,4 +619,35 @@ struct DurationView: View {
     }
 }
 
-
+struct AdditionalExerciseInfoView: View {
+    
+    var vm: ExerciseDetailsViewModel
+    @Binding var showingInfo: Bool
+    
+    var body: some View {
+        if !vm.exercise.info.isEmpty && !showingInfo {
+            Button(action: {
+                withAnimation {
+                    showingInfo.toggle()
+                }
+            }) {
+                Text("Show Exercise Info")
+                    .font(.body)
+            }
+        }
+        if showingInfo {
+            VStack {
+                Text("\(vm.exercise.info)")
+                    .font(.body)
+                Button(action: {
+                    withAnimation {
+                        showingInfo.toggle()
+                    }
+                }) {
+                    Text("Collapse Exercise Info")
+                        .font(.body)
+                }
+            }
+        }
+    }
+}

@@ -16,6 +16,7 @@ struct WorkoutDetails: View {
     @State private var newWorkoutTemplateSet: WorkoutTemplateSet?
     @State private var isEditing: Bool = false
     @State private var showingAlert = false
+    @State private var selectedSetIDs: [UUID] = []
     
     var sortedSets: [WorkoutTemplateSet] {
         workout.templateSets.sorted { $0.date < $1.date }
@@ -53,7 +54,13 @@ struct WorkoutDetails: View {
         .alert("Track Workout", isPresented: $showingAlert) {
             Button("Cancel", role: .cancel) { }
             Button("Confirm") {
-                DataManager.shared.addWorkoutSetsToExercises(workout: workout, modelContext: modelContext)
+                let setsToTrack = sortedSets.filter { set in
+                    selectedSetIDs.contains(set.id)
+                }.sorted { first, second in
+                    selectedSetIDs.firstIndex(of: first.id)! < selectedSetIDs.firstIndex(of: second.id)!
+                }
+                DataManager.shared.addWorkoutSetsToExercises(sets: setsToTrack, modelContext: modelContext)
+                selectedSetIDs.removeAll()
             }
         } message: {
             Text("Are you sure you want to add these sets to your exercises?")
@@ -156,6 +163,21 @@ struct WorkoutDetails: View {
                     }
                 }
                 .listRowSeparator(.hidden)
+                .listRowBackground(
+                    selectedSetIDs.contains(set.id) ?
+                    Color.blue.opacity(0.1) :
+                        Color.clear
+                )
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    if !isEditing {
+                        if let index = selectedSetIDs.firstIndex(of: set.id) {
+                            selectedSetIDs.remove(at: index)
+                        } else {
+                            selectedSetIDs.append(set.id)
+                        }
+                    }
+                }
             }
             .onDelete(perform: isEditing ? deleteWorkoutSets : nil)
         }
@@ -167,8 +189,9 @@ struct WorkoutDetails: View {
             }
         } else {
             Button(action: { showingAlert = true }) {
-                Label("Track Selected Sets", systemImage: "checkmark.circle")
+                Label("Track Selected Sets (\(selectedSetIDs.count))", systemImage: "checkmark.circle")
             }
+            .disabled(selectedSetIDs.isEmpty)
         }
     }
     
