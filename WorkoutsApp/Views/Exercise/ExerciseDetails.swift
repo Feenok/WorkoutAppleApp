@@ -30,6 +30,10 @@ struct ExerciseDetails: View {
     @State private var setDeletionEnabled: Bool = false
     @State private var showingInfo = false
     
+    @State private var sortByWeight: Bool = true
+    @State private var sortByReps: Bool = false
+    @State private var sortByTime: Bool = false
+    
     private var hasSetsForDate: Bool {
         let dayStart = Calendar.current.startOfDay(for: displayedDate)
         return !(vm.allSetsDictionary[dayStart]?.isEmpty ?? true)
@@ -41,6 +45,7 @@ struct ExerciseDetails: View {
     
     var body: some View {
         let displayedDateStart = Calendar.current.startOfDay(for: displayedDate)
+        let hasTimedExercises = vm.exercise.allSets.contains { $0.duration != nil && $0.duration! > 0 }
         
         Group {
             if !vm.exercise.allSets.isEmpty {
@@ -53,9 +58,14 @@ struct ExerciseDetails: View {
                         if let prSet = vm.exercise.PRSet {
                             ExerciseSetView(exerciseSet: prSet, setType: .greatest)
                         }
+                        
+                        // Sort view by:
+                        ViewSortingButtons(sortByWeight: $sortByWeight, sortByReps: $sortByReps, sortByTime: $sortByTime, hasTimedExercises: hasTimedExercises)
+                            .padding(.bottom)
+                        
                         //Chart
                         Group {
-                            ExerciseChartView(sets: vm.allSetsDictionary, rawSelectedDate: $selectedDate)
+                            ExerciseChartView(vm: vm, sets: vm.allSetsDictionary, sortByWeight: sortByWeight, sortByReps: sortByReps, sortByTime: sortByTime, rawSelectedDate: $selectedDate)
                                 .onChange(of: selectedDate) { oldValue, newValue in
                                     if let newDate = newValue {
                                         displayedDate = newDate
@@ -657,6 +667,63 @@ struct AdditionalExerciseInfoView: View {
                         .padding()
                 }
             }
+        }
+    }
+}
+
+struct ViewSortingButtons: View {
+    
+    @Binding var sortByWeight: Bool
+    @Binding var sortByReps: Bool
+    @Binding var sortByTime: Bool
+    var hasTimedExercises: Bool
+    
+    var body: some View {
+        VStack (spacing: 0) {
+            Text("Sort Chart By:")
+                .foregroundStyle(.gray)
+                .font(.caption2)
+            HStack {
+                Spacer()
+                Button {
+                    // Sort by weight
+                    sortByWeight = true
+                    sortByReps = false
+                    sortByTime = false
+                } label: {
+                    Text("Weight")
+                        .foregroundStyle(sortByWeight ? .blue : .gray)
+                }
+                Spacer()
+                Button {
+                    // Sort by reps
+                    sortByWeight = false
+                    sortByReps = true
+                    sortByTime = false
+                } label: {
+                    Text("Reps")
+                        .foregroundStyle(sortByReps ? .blue : .gray)
+                        .padding(.horizontal)
+                }
+                Spacer()
+                if hasTimedExercises {
+                    Button {
+                        // Sort by time
+                        sortByWeight = false
+                        sortByReps = false
+                        sortByTime = true
+                    } label: {
+                        Text("Duration")
+                            .foregroundStyle(sortByTime ? .blue : .gray)
+                    }
+                    Spacer()
+                }
+            }
+        }
+        .padding(.vertical, 5)
+        .background {
+            RoundedRectangle(cornerRadius: 8)
+                .foregroundStyle(Color.gray.opacity(0.12))
         }
     }
 }
