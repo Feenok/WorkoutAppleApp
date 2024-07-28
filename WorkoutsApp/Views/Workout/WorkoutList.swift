@@ -64,6 +64,12 @@ struct WorkoutList: View {
                     }
                 }
             }
+            ToolbarItem(placement: .topBarLeading) {
+                Button(action: {}) {
+                    Image(systemName: "info.circle")
+                        .foregroundStyle(.blue)
+                }
+            }
         }
         .sheet(item: $newWorkout) { workout in
             NavigationStack {

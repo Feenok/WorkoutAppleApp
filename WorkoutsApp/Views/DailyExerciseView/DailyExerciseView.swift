@@ -21,15 +21,15 @@ struct DailyExerciseView: View {
                 .onChange(of: selectedDate) { oldValue, newValue in
                     exerciseSets = fetchExercisesForDate(newValue)
                 }
-            
+                .padding(.horizontal)
             List {
-                ForEach(exerciseSets) { set in
-                    ExerciseSetRow(set: set)
+                ForEach(Array(exerciseSets.enumerated()), id: \.element.id) { index, set in
+                    ExerciseSetRow(set: set, index: index)
                 }
                 .onMove(perform: moveItem)
                 .onDelete(perform: deleteItem)
             }
-            //.environment(\.editMode, .constant(isEditing ? .active : .inactive))
+            .padding(.horizontal, -8)
         }
         .navigationTitle("Daily Workout")
         .onAppear {
@@ -93,18 +93,31 @@ struct DailyExerciseView: View {
 
 struct ExerciseSetRow: View {
     let set: ExerciseSet
+    let index: Int
     
     var body: some View {
         HStack {
             VStack(alignment: .leading) {
-                Text(set.exercise?.name ?? "Unknown Exercise")
-                    .font(.caption2)
-                    .foregroundColor(.secondary)
-                
+                HStack (spacing: 2) {
+                    Text("\(index + 1).")
+                    .bold()
+                    Text((set.exercise?.name ?? "Unknown Exercise").uppercased())
+                }
+                .padding(.leading, -10)
+                .font(.caption)
+                .foregroundColor(.secondary)
                 HStack {
-                    Text("\(set.weight) LBS")
+                    Text("\(set.weight)")
+                    Text("LBS")
+                        .foregroundStyle(.secondary)
+                        .font(.caption2)
+                        .padding(.top, 3)
                     Spacer()
-                    Text("\(set.reps) REPS")
+                    Text("\(set.reps)")
+                    Text("REPS")
+                        .foregroundStyle(.secondary)
+                        .font(.caption2)
+                        .padding(.top, 3)
                 }
                 .font(.body)
             }

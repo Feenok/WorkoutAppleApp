@@ -104,7 +104,6 @@
 		E9AA5CB42C474DA100805A71 /* Data */ = {
 			isa = PBXGroup;
 			children = (
-				E9AA5CD82C4DF40500805A71 /* DataManager.swift */,
 			);
 			path = Data;
 			sourceTree = "<group>";
@@ -165,6 +164,7 @@
 			isa = PBXGroup;
 			children = (
 				E9AA5CDD2C4F425000805A71 /* StopwatchManager.swift */,
+				E9AA5CD82C4DF40500805A71 /* DataManager.swift */,
 			);
 			path = Manager;
 			sourceTree = "<group>";
