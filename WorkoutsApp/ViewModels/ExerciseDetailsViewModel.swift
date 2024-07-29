@@ -54,10 +54,24 @@ class ExerciseDetailsViewModel: ObservableObject {
         let newPRSet = allSetsDictionary.values
             .flatMap { $0 }
             .max { a, b in
-                if a.weight == b.weight {
+                if a.weight != b.weight {
+                    return a.weight < b.weight
+                }
+                if a.reps != b.reps {
                     return a.reps < b.reps
                 }
-                return a.weight < b.weight
+                // If weight and reps are equal, compare duration
+                // Assuming duration is optional (TimeInterval?)
+                switch (a.duration, b.duration) {
+                case (let durationA?, let durationB?):
+                    return durationA < durationB
+                case (nil, .some):
+                    return true  // b is greater because it has a duration and a doesn't
+                case (.some, nil):
+                    return false // a is greater because it has a duration and b doesn't
+                case (nil, nil):
+                    return false // They're equal if both have no duration
+                }
             }
         
         exercise.PRSet = newPRSet
@@ -94,20 +108,6 @@ class ExerciseDetailsViewModel: ObservableObject {
     func secondsToMinutesAndSeconds(_ seconds: Int) -> (Int, Int) {
         return (seconds / 60, seconds % 60)
     }
-    
-    /*
-    //UI FUNCTIONS
-    func getPeakSetForDate(_ date: Date) -> ExerciseSet? {
-        let dayStart = Calendar.current.startOfDay(for: date)
-        return allSetsDictionary[dayStart]?.max(by: { $0.weight < $1.weight })
-    }
-    
-    func getAllPeakSets() -> [Date: ExerciseSet] {
-        return allSetsDictionary.mapValues { sets in
-            sets.max(by: { $0.weight < $1.weight })!
-        }
-    }
-     */
     
     //TODO: IMPLEMENT DATA INDEX FOR CHART
     /*

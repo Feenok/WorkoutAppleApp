@@ -95,7 +95,7 @@ struct ExerciseChartView: View {
                         .padding(.top, -15)
                         .padding(.trailing, -15)
                 } else if sortByReps {
-                    Text("Reps Count")
+                    Text("Reps")
                         .font(.caption)
                         .foregroundStyle(.gray)
                         .rotationEffect(Angle(degrees: -90))
@@ -188,7 +188,13 @@ struct ExerciseChartView: View {
                                 y: .fit(to: .chart)
                             )
                         ) {
-                            valueSelectionPopover
+                            if sortByWeight {
+                                valueSelectionPopoverMaxWeight
+                            } else if sortByReps {
+                                valueSelectionPopoverMaxReps
+                            } else if sortByTime {
+                                valueSelectionPopoverMaxDuration
+                            }
                         }
                     }
                 }
@@ -231,7 +237,7 @@ struct ExerciseChartView: View {
     }
     
     @ViewBuilder
-    var valueSelectionPopover: some View {
+    var valueSelectionPopoverMaxWeight: some View {
         let padding: CGFloat = -4
         if let details = selectedDateMaxWeightDetails, let date = selectedDate {
             VStack(alignment: .leading) {
@@ -270,17 +276,121 @@ struct ExerciseChartView: View {
     }
     
     @ViewBuilder
-    private var durationView: some View {
-        if let duration = selectedDateMaxWeightDetails?.duration {
-            let (minutes, seconds) = vm.secondsToMinutesAndSeconds(Int(duration))
-            HStack {
-                Image(systemName: "stopwatch.fill")
-                    .foregroundStyle(.gray)
-                    .font(.caption)
-                    .padding(.trailing, -5)
-                DurationView(minutes: minutes, seconds: seconds)
+    var valueSelectionPopoverMaxReps: some View {
+        let padding: CGFloat = -4
+        if let details = selectedDateMaxRepsDetails, let date = selectedDate {
+            VStack(alignment: .leading) {
+                Text("MAX REPS").foregroundStyle(.gray).padding(.vertical, padding).font(.caption).fontWeight(.semibold)
+                HStack{
+                    HStack(alignment: .bottom) {
+                        Text("\(details.reps)").font(.title3).padding(.vertical, padding).padding(.trailing, padding).fontWeight(.semibold)
+                        Text("REPS").foregroundStyle(.gray).padding(.vertical, padding).padding(.bottom, 2).font(.caption).fontWeight(.semibold)
+                    }
+                    HStack(alignment: .bottom) {
+                        Text("\(details.weight)").font(.title3).padding(.vertical, padding).padding(.trailing, padding).fontWeight(.semibold)
+                        Text("LBS").foregroundStyle(.gray).padding(.vertical, padding).padding(.bottom, 2).font(.caption).fontWeight(.semibold)
+                    }
+                }
+                durationView
+                Text("\(date, format: .dateTime.year().month().day())").foregroundStyle(.gray).padding(.vertical, padding).font(.caption).fontWeight(.semibold)
+            }
+            .padding(6)
+            .background {
+                RoundedRectangle(cornerRadius: 4)
+                .foregroundStyle(Color.gray.opacity(0.12))
+            }
+        } else {
+            if let date = selectedDate {
+                VStack {
+                    Text("\(date, format: .dateTime.year().month().day())").foregroundStyle(.gray).padding(.vertical, padding).font(.caption).fontWeight(.semibold)
+                    Text("No data available").foregroundStyle(.gray).padding(.vertical, padding).font(.caption).fontWeight(.semibold)
+                }
+                .padding(6)
+                .background {
+                    RoundedRectangle(cornerRadius: 4)
+                        .foregroundStyle(Color.gray.opacity(0.12))
+                }
             }
         }
+    }
+    
+    @ViewBuilder
+    var valueSelectionPopoverMaxDuration: some View {
+        let padding: CGFloat = -4
+        if let details = selectedDateMaxDurationDetails, let date = selectedDate {
+            VStack(alignment: .leading) {
+                Text("MAX TIME").foregroundStyle(.gray).padding(.vertical, padding).font(.caption).fontWeight(.semibold)
+                durationView
+                HStack{
+                    HStack(alignment: .bottom) {
+                        Text("\(details.weight)").font(.caption).padding(.vertical, padding).padding(.trailing, padding).fontWeight(.semibold)
+                        Text("LBS").foregroundStyle(.gray).padding(.vertical, padding).font(.caption).fontWeight(.semibold)
+                    }
+                    HStack(alignment: .bottom) {
+                        Text("\(details.reps)").font(.caption).padding(.vertical, padding).padding(.trailing, padding).fontWeight(.semibold)
+                        Text("REPS").foregroundStyle(.gray).padding(.vertical, padding).font(.caption).fontWeight(.semibold)
+                    }
+                }
+                Text("\(date, format: .dateTime.year().month().day())").foregroundStyle(.gray).padding(.vertical, padding).font(.caption).fontWeight(.semibold)
+            }
+            .padding(6)
+            .background {
+                RoundedRectangle(cornerRadius: 4)
+                .foregroundStyle(Color.gray.opacity(0.12))
+            }
+        } else {
+            if let date = selectedDate {
+                VStack {
+                    Text("\(date, format: .dateTime.year().month().day())").foregroundStyle(.gray).padding(.vertical, padding).font(.caption).fontWeight(.semibold)
+                    Text("No data available").foregroundStyle(.gray).padding(.vertical, padding).font(.caption).fontWeight(.semibold)
+                }
+                .padding(6)
+                .background {
+                    RoundedRectangle(cornerRadius: 4)
+                        .foregroundStyle(Color.gray.opacity(0.12))
+                }
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private var durationView: some View {
+        
+        if sortByWeight {
+            if let duration = selectedDateMaxWeightDetails?.duration {
+                let (minutes, seconds) = vm.secondsToMinutesAndSeconds(Int(duration))
+                HStack {
+                    Image(systemName: "stopwatch.fill")
+                        .foregroundStyle(.gray)
+                        .font(.caption)
+                        .padding(.trailing, -5)
+                    DurationView(minutes: minutes, seconds: seconds)
+                }
+            }
+        } else if sortByReps {
+            if let duration = selectedDateMaxRepsDetails?.duration {
+                let (minutes, seconds) = vm.secondsToMinutesAndSeconds(Int(duration))
+                HStack {
+                    Image(systemName: "stopwatch.fill")
+                        .foregroundStyle(.gray)
+                        .font(.caption)
+                        .padding(.trailing, -5)
+                    DurationView(minutes: minutes, seconds: seconds)
+                }
+            }
+        } else if sortByTime {
+            if let duration = selectedDateMaxDurationDetails?.duration {
+                let (minutes, seconds) = vm.secondsToMinutesAndSeconds(Int(duration))
+                HStack {
+                    Image(systemName: "stopwatch.fill")
+                        //.foregroundStyle(.gray)
+                        .font(.title3)
+                        .padding(.trailing, -5)
+                    DurationView(minutes: minutes, seconds: seconds)
+                }
+            }
+        }
+        
     }
     
 }

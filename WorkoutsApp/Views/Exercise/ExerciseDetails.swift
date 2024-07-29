@@ -56,12 +56,13 @@ struct ExerciseDetails: View {
                         
                         //Personal best set
                         if let prSet = vm.exercise.PRSet {
-                            ExerciseSetView(exerciseSet: prSet, setType: .greatest)
+                            ExerciseSetView(vm: vm, exerciseSet: prSet, setType: .greatest)
                         }
                         
                         // Sort view by:
                         ViewSortingButtons(sortByWeight: $sortByWeight, sortByReps: $sortByReps, sortByTime: $sortByTime, hasTimedExercises: hasTimedExercises)
                             .padding(.bottom)
+                            .padding(.horizontal, 16)
                         
                         //Chart
                         Group {
@@ -76,7 +77,7 @@ struct ExerciseDetails: View {
                         .padding(.horizontal, 8)
                         
                         //Latest set
-                        ExerciseSetView(exerciseSet: vm.findLatestSet()!, setType: .latest)
+                        ExerciseSetView(vm:vm, exerciseSet: vm.findLatestSet()!, setType: .latest)
                         
                         //Show more data
                         
@@ -303,6 +304,8 @@ struct ExerciseSetView: View {
         case greatest
     }
     
+    
+    var vm: ExerciseDetailsViewModel
     var exerciseSet: ExerciseSet
     var setType: SetStanding
     let padding: CGFloat = -4
@@ -310,11 +313,29 @@ struct ExerciseSetView: View {
     var body: some View {
         Group {
             HStack {
-                Text(setType == .latest ? "Latest:" : "Record:")
-                    .padding(.trailing, -4)
-                Text("\(exerciseSet.date, format: .dateTime.year().month().day())")
-                    .fontWeight(.semibold)
-                    .padding(.vertical, padding)
+                VStack(alignment: .leading) {
+                    HStack {
+                        Text(setType == .latest ? "Latest:" : "Record:")
+                            .padding(.trailing, -4)
+                            .font(.caption)
+                            .fontWeight(.semibold)
+                            .foregroundStyle(.gray)
+                        Text("\(exerciseSet.date, format: .dateTime.year().month().day())")
+                            .fontWeight(.semibold)
+                            .padding(.vertical, padding)
+                    }
+                    if let duration = exerciseSet.duration {
+                        let (minutes, seconds) = vm.secondsToMinutesAndSeconds(Int(duration))
+                        HStack {
+                            Image(systemName: "stopwatch.fill")
+                                .foregroundStyle(.gray)
+                                .font(.caption)
+                                .padding(.trailing, -5)
+                            DurationView(minutes: minutes, seconds: seconds)
+                        }
+                        .frame(width: .infinity, alignment: .leading)
+                    }
+                }
                 Spacer()
                 VStack {
                     HStack {
@@ -391,7 +412,7 @@ struct MoreDataView: View {
             Group {
                 Text("You've completed a total of ") +
                 Text("\(totalReps)").bold() +
-                Text(" reps with an average weight of ") +
+                Text(" rep(s) with an average weight of ") +
                 Text("\(averageRepWeight)").bold() +
                 Text(" lbs.")
             }
@@ -683,8 +704,8 @@ struct ViewSortingButtons: View {
             Text("Sort Chart By:")
                 .foregroundStyle(.gray)
                 .font(.caption2)
+    
             HStack {
-                Spacer()
                 Button {
                     // Sort by weight
                     sortByWeight = true
@@ -693,6 +714,7 @@ struct ViewSortingButtons: View {
                 } label: {
                     Text("Weight")
                         .foregroundStyle(sortByWeight ? .blue : .gray)
+                        .padding(.horizontal)
                 }
                 Spacer()
                 Button {
@@ -705,8 +727,8 @@ struct ViewSortingButtons: View {
                         .foregroundStyle(sortByReps ? .blue : .gray)
                         .padding(.horizontal)
                 }
-                Spacer()
                 if hasTimedExercises {
+                    Spacer()
                     Button {
                         // Sort by time
                         sortByWeight = false
@@ -715,8 +737,9 @@ struct ViewSortingButtons: View {
                     } label: {
                         Text("Duration")
                             .foregroundStyle(sortByTime ? .blue : .gray)
+                            .padding(.horizontal)
                     }
-                    Spacer()
+                    
                 }
             }
         }

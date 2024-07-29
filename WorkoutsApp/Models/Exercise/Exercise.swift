@@ -33,8 +33,7 @@ final class Exercise {
     var info: String = ""
     
     @Relationship(deleteRule: .cascade) var allSets: [ExerciseSet] = []
-    var PRSet: ExerciseSet? // Personal Record set
-    
+    var PRSet: ExerciseSet? // Personal Weight Record set
     
     init(name: String, category: ExerciseCategory) {
             self.name = name
