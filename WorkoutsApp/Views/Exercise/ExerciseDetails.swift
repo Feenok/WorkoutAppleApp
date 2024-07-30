@@ -33,6 +33,7 @@ struct ExerciseDetails: View {
     @State private var sortByWeight: Bool = true
     @State private var sortByReps: Bool = false
     @State private var sortByTime: Bool = false
+    @State private var editingExercise: Bool = false
     
     private var hasSetsForDate: Bool {
         let dayStart = Calendar.current.startOfDay(for: displayedDate)
@@ -82,7 +83,6 @@ struct ExerciseDetails: View {
                         ExerciseSetView(vm:vm, exerciseSet: vm.findLatestSet()!, setType: .latest)
                         
                         //Show more data
-                        
                         if showingMoreData && vm.allSetsDictionary[displayedDateStart] != nil && !vm.allSetsDictionary[displayedDateStart]!.isEmpty {
                             MoreDataView(displayedDate: displayedDate, vm: vm, timedExercise: timedExercise, showingMoreData: $showingMoreData)
                         } else {
@@ -98,7 +98,7 @@ struct ExerciseDetails: View {
                         }
                         
                         //Daily Set list
-                        SetsByDateDetailsView(displayedDate: displayedDate, insetExpanded: $insetExpanded, vm: vm, setDeletionEnabled: $setDeletionEnabled)
+                        SetsByDateDetailsView(displayedDate: displayedDate, insetExpanded: $insetExpanded, vm: vm, setDeletionEnabled: $setDeletionEnabled, hasSetsForDate: hasSetsForDate)
                     }
                 }
             }
@@ -134,18 +134,21 @@ struct ExerciseDetails: View {
         }
         .navigationTitle("\(vm.exercise.name)")
         .toolbar {
-            if hasSetsForDate {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: {
-                        withAnimation {
-                            setDeletionEnabled.toggle()
-                        }
-                    }) {
-                        Text(setDeletionEnabled ? "Cancel" : "Delete Set")
-                            .foregroundStyle(.red)
-                    }
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button {
+                    editingExercise = true
+                } label: {
+                    Text("Edit")
                 }
             }
+        }
+        .sheet(isPresented: $editingExercise, onDismiss: {
+            editingExercise = false
+        }) {
+            NavigationStack {
+                EditExercise(exercise: vm.exercise)
+            }
+            //.interactiveDismissDisabled()
         }
         .safeAreaInset(edge: .bottom) {
             if insetExpanded {
@@ -490,9 +493,9 @@ struct SetsByDateDetailsView: View {
     var displayedDate: Date
     @Binding var insetExpanded: Bool
     @ObservedObject var vm: ExerciseDetailsViewModel
-    
     @Binding var setDeletionEnabled: Bool
     @State private var setToDelete: (set: ExerciseSet, index: Int)?
+    var hasSetsForDate: Bool
      
     
     let padding: CGFloat = -4
@@ -536,6 +539,19 @@ struct SetsByDateDetailsView: View {
                 Text("No sets for this date")
                     .foregroundColor(.secondary)
             }
+            
+            // Delete sets button
+            if hasSetsForDate {
+                Button(action: {
+                    withAnimation {
+                        setDeletionEnabled.toggle()
+                    }
+                }) {
+                    Text(setDeletionEnabled ? "Cancel" : "Delete Set")
+                        .foregroundStyle(.red)
+                }
+            }
+            
         }
         .padding(.horizontal)
         .cornerRadius(10)

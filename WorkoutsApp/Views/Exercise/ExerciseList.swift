@@ -13,7 +13,6 @@ struct ExerciseList: View {
     @Query private var exercises: [Exercise]
     
     @State private var newExercise: Exercise?
-    @State private var exerciseToEdit: Exercise?
     
     @State private var selectedCategory: ExerciseCategory?
     @State private var isDropdownVisible = false
@@ -48,12 +47,7 @@ struct ExerciseList: View {
             if !exercises.isEmpty {
                 List {
                     ForEach(filteredExercises) { exercise in
-                        ExerciseRow(
-                            exercise: exercise,
-                            onLongPress: {
-                                exerciseToEdit = exercise
-                            }
-                        )
+                        ExerciseRow(exercise: exercise)
                     }
                     .onDelete(perform: deleteExercises)
                 }
@@ -110,12 +104,6 @@ struct ExerciseList: View {
             }
             .interactiveDismissDisabled()
         }
-        .sheet(item: $exerciseToEdit) { exercise in
-            NavigationStack {
-                EditExercise(exercise: exercise)
-            }
-            .interactiveDismissDisabled()
-        }
     }
 
     private func addExercise() {
@@ -138,7 +126,6 @@ struct ExerciseList: View {
 
 struct ExerciseRow: View {
     let exercise: Exercise
-    let onLongPress: () -> Void
     
     @State private var isPressed = false
     @GestureState private var longPress = false
@@ -149,17 +136,6 @@ struct ExerciseRow: View {
         } label: {
             Text(exercise.name)
         }
-        .simultaneousGesture(
-            LongPressGesture(minimumDuration: 0.5)
-                .updating($longPress) { currentState, gestureState, _ in
-                    gestureState = currentState
-                }
-                .onEnded { _ in
-                    onLongPress()
-                }
-        )
-        .scaleEffect(longPress ? 0.95 : 1.0)
-        .animation(.easeInOut(duration: 0.2), value: longPress)
     }
 }
 

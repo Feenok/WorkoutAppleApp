@@ -30,7 +30,30 @@ struct WorkoutList: View {
                         NavigationLink {
                             WorkoutDetails(workout: workout)
                         } label: {
-                            Text(workout.name)
+                            HStack (spacing: 2) {
+                                Text(workout.name)
+                                Spacer()
+                                if workout.bestTimeMinutes != nil || workout.bestTimeSeconds != nil {
+                                    Image(systemName: "stopwatch.fill")
+                                        .foregroundStyle(.gray)
+                                        .font(.caption)
+                                }
+                                if let minutes = workout.bestTimeMinutes {
+                                    Text("\(minutes)")
+                                        .font(.caption)
+                                    Text("min")
+                                        .foregroundStyle(.gray)
+                                        .font(.caption)
+                                }
+                                if let seconds = workout.bestTimeSeconds {
+                                    Text("\(seconds)")
+                                        //.foregroundStyle(.gray)
+                                        .font(.caption)
+                                    Text("sec")
+                                        .foregroundStyle(.gray)
+                                        .font(.caption)
+                                }
+                            }
                         }
                     }
                     .onDelete(perform: deleteWorkouts)

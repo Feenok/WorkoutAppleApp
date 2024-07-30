@@ -21,6 +21,18 @@ struct EnterWorkout: View {
     var body: some View {
         Form {
             TextField("Workout name", text: $workout.name)
+            VStack(alignment: .leading) {
+                Text("Workout Info")
+                    .frame(width: .infinity, alignment: .leading)
+                    .foregroundColor(.gray.opacity(0.5))
+                TextEditor(text: $workout.info)
+                    .frame(height: 200)
+                    .foregroundColor(.gray)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(Color.gray.opacity(0.2), lineWidth: 1)
+                    )
+            }
         }
         .navigationTitle("Add Workout")
         .toolbar{

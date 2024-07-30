@@ -36,5 +36,15 @@ class DataManager {
         let descriptor = FetchDescriptor<Exercise>(predicate: #Predicate { $0.name == name })
         return try context.fetch(descriptor).first
     }
+    
+    func getDuration(minutes: Int, seconds: Int) -> TimeInterval? {
+        return TimeInterval(minutes * 60 + seconds)
+    }
+    
+    func secondsToMinutesAndSeconds(_ seconds: Int) -> (Int, Int) {
+        return (seconds / 60, seconds % 60)
+    }
+    
+    
 }
 

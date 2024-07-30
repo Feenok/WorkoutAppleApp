@@ -19,7 +19,3 @@ struct FilteredExerciseList: View {
         }
     }
 }
-
-#Preview {
-    FilteredExerciseList()
-}
