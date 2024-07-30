@@ -39,6 +39,7 @@ struct WorkoutList: View {
                 VStack {
                     Spacer()
                     Text("No Workouts")
+                        .font(.title3)
                         .bold()
                     Spacer()
                     Button(action: addWorkout) {

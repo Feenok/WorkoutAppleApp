@@ -30,6 +30,7 @@ struct EnterExercise: View {
             VStack(alignment: .leading) {
                 Text("Exercise Info")
                     .frame(width: .infinity, alignment: .leading)
+                    .foregroundColor(.gray.opacity(0.5))
                 TextEditor(text: $exercise.info)
                     .frame(height: 200)
                     .foregroundColor(.gray)

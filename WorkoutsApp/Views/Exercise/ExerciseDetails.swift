@@ -9,9 +9,9 @@ import SwiftUI
 import SwiftData
 
 struct ExerciseDetails: View {
-    @ObservedObject private var vm: ExerciseDetailsViewModel
+    @StateObject private var vm: ExerciseDetailsViewModel
     @State var selectedDate: Date? = nil
-    @State private var displayedDate: Date = Calendar.current.startOfDay(for: Date()) // Date displayed for the daily sets list
+    @State private var displayedDate: Date // Date displayed for the daily sets list
     
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
@@ -39,8 +39,10 @@ struct ExerciseDetails: View {
         return !(vm.allSetsDictionary[dayStart]?.isEmpty ?? true)
     }
     
-    init(exercise: Exercise) {
-        _vm = ObservedObject(wrappedValue: ExerciseDetailsViewModel(exercise: exercise))
+    init(exercise: Exercise, displayedDate: Date = Calendar.current.startOfDay(for: Date())) {
+        let viewModel = ExerciseDetailsViewModel(exercise: exercise)
+        _vm = StateObject(wrappedValue: viewModel)
+        _displayedDate = State(initialValue: displayedDate)
     }
     
     var body: some View {
@@ -188,7 +190,7 @@ struct AddNewSetView: View {
                                 newSetDate = today
                             }
                             
-                            let newSet = ExerciseSet(weight: weight, reps: reps, date: newSetDate)
+                            let newSet = ExerciseSet(weight: weight, reps: reps, date: newSetDate, exercise: vm.exercise)
                             
                             // Add duration data if timed
                             if timedExercise {

@@ -69,8 +69,13 @@ struct WorkoutDetails: View {
                 }.sorted { first, second in
                     selectedSetIDs.firstIndex(of: first.id)! < selectedSetIDs.firstIndex(of: second.id)!
                 }
-                DataManager.shared.addWorkoutSetsToExercises(sets: setsToTrack, modelContext: modelContext)
-                selectedSetIDs.removeAll()
+                do {
+                    try DataManager.shared.addWorkoutSetsToExercises(sets: setsToTrack, modelContext: modelContext)
+                    selectedSetIDs.removeAll()
+                } catch {
+                    // Handle the error, perhaps show an alert to the user
+                    print("Error tracking workout: \(error)")
+                }
             }
         } message: {
             Text("Are you sure you want to add these sets to your exercises?")
@@ -78,7 +83,7 @@ struct WorkoutDetails: View {
     }
     
     private func addWorkoutSet() {
-        let newItem = WorkoutTemplateSet(name: "", targetWeight: 0, targetReps: 0)
+        let newItem = WorkoutTemplateSet(name: "", targetWeight: 0, targetReps: 0, workout: workout)
         newWorkoutTemplateSet = newItem
     }
 
@@ -90,6 +95,22 @@ struct WorkoutDetails: View {
                 modelContext.delete(setToDelete)
             }
         }
+    }
+    
+    private func moveWorkoutSets(from source: IndexSet, to destination: Int) {
+        var updatedSets = sortedSets
+        updatedSets.move(fromOffsets: source, toOffset: destination)
+        
+        // Update the date of each set to maintain the new order
+        for (index, set) in updatedSets.enumerated() {
+            set.date = Date().addingTimeInterval(TimeInterval(index))
+        }
+        
+        // Update the workout's templateSets
+        workout.templateSets = updatedSets
+        
+        // Save changes to SwiftData
+        try? modelContext.save()
     }
     
     @ViewBuilder
@@ -178,13 +199,6 @@ struct WorkoutDetails: View {
                 }
                 .listRowSeparator(.hidden)
                 .listRowBackground(Color.clear)
-                /*
-                .listRowBackground(
-                    selectedSetIDs.contains(set.id) ?
-                    Color.blue.opacity(0.1) :
-                        Color.clear
-                )
-                 */
                 .contentShape(Rectangle())
                 .onTapGesture {
                     if !isEditing {
@@ -196,6 +210,7 @@ struct WorkoutDetails: View {
                     }
                 }
             }
+            .onMove(perform: isEditing ? moveWorkoutSets : nil)
             .onDelete(perform: isEditing ? deleteWorkoutSets : nil)
         }
         .listStyle(PlainListStyle())
@@ -203,10 +218,12 @@ struct WorkoutDetails: View {
         if isEditing {
             Button(action: addWorkoutSet) {
                 Label("Add Set", systemImage: "plus")
+                    .padding(.vertical)
             }
         } else {
             Button(action: { showingAlert = true }) {
                 Label("Track Selected Sets (\(selectedSetIDs.count))", systemImage: "checkmark.circle")
+                    .padding(.vertical)
             }
             .disabled(selectedSetIDs.isEmpty)
         }
