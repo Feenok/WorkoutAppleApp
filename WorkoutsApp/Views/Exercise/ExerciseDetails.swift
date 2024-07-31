@@ -82,6 +82,27 @@ struct ExerciseDetails: View {
                         //Latest set
                         ExerciseSetView(vm:vm, exerciseSet: vm.findLatestSet()!, setType: .latest)
                         
+                        HStack {
+                            Text("\(displayedDate, format: .dateTime.year().month().day()) - Sets")
+                                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+                                .font(.title3)
+                                .fontWeight(.bold)
+                                .padding(.vertical, 8)
+                            
+                            Button(action: {
+                                withAnimation {
+                                    insetExpanded.toggle()
+                                }
+                            }) {
+                                Text("Add Set")
+                                    .foregroundStyle(insetExpanded ? .gray : .blue)
+                                    .opacity(insetExpanded ? 0.5 : 1.0)
+                            }
+                            .disabled(insetExpanded)
+                        }
+                        .padding(.horizontal)
+                        .padding(.bottom)
+                        
                         //Show more data
                         if showingMoreData && vm.allSetsDictionary[displayedDateStart] != nil && !vm.allSetsDictionary[displayedDateStart]!.isEmpty {
                             MoreDataView(displayedDate: displayedDate, vm: vm, timedExercise: timedExercise, showingMoreData: $showingMoreData)
@@ -91,7 +112,7 @@ struct ExerciseDetails: View {
                                     showingMoreData = true
                                 }
                             }) {
-                                Text(vm.allSetsDictionary[displayedDateStart] != nil ? "Show More Exercise Data" : "No Exercise Data")
+                                Text(vm.allSetsDictionary[displayedDateStart] != nil ? "Show More Exercise Data" : "")
                                     .foregroundStyle(vm.allSetsDictionary[displayedDateStart] != nil ? .blue : .gray)
                             }
                             .disabled(vm.allSetsDictionary[displayedDateStart] == nil)
@@ -403,6 +424,10 @@ struct MoreDataView: View {
             sum + (set.duration ?? 0)
         }
         
+        let monthlyAvgVL = vm.monthlyAverageVolumeLoad()
+        
+        let volumeLoadPercentChange = vm.volumeLoadPercentChange(for: displayedDate)
+                
         VStack (alignment: .leading) {
             HStack {
                 Image(systemName: "dumbbell.fill")
@@ -439,6 +464,30 @@ struct MoreDataView: View {
                 Text(" lbs.")
             }
             .padding()
+            
+            Group {
+                if volumeLoad == vm.maxVolumeLoad {
+                    Text("This is the max volume load lifted yet.")
+                } else {
+                    HStack {
+                        Text("The max volume load lifted was ") +
+                        Text("\(vm.maxVolumeLoad)").bold() +
+                        Text(" lbs on \(vm.maxVLDate, format: .dateTime.month().day().year()).")
+                    }
+                }
+            }
+            .padding(.horizontal)
+            
+            
+            Group {
+                Text("This is a ") +
+                Text(String(format: "%.1f%%", volumeLoadPercentChange))
+                    .bold()
+                    .foregroundStyle(volumeLoadPercentChange > 0 ? .green : .red) +
+                Text(" change from the last 30 day average of \(monthlyAvgVL) lbs.")
+            }
+            .padding()
+            
             
             if totalDuration > 0 {
                 HStack {
@@ -502,26 +551,6 @@ struct SetsByDateDetailsView: View {
     
     var body: some View {
         VStack {
-            HStack {
-                Text("\(displayedDate, format: .dateTime.year().month().day()) - Sets")
-                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
-                    .font(.title3)
-                    .fontWeight(.bold)
-                    .padding(.vertical, 8)
-                
-                Button(action: {
-                    withAnimation {
-                        insetExpanded.toggle()
-                    }
-                }) {
-                    Text("Add Set")
-                        .foregroundStyle(insetExpanded ? .gray : .blue)
-                        .opacity(insetExpanded ? 0.5 : 1.0)
-                }
-                .disabled(insetExpanded)
-                
-            }
-
             let dayStart = Calendar.current.startOfDay(for: displayedDate)
             if let sets = vm.allSetsDictionary[dayStart], !sets.isEmpty {
                 
@@ -547,7 +576,7 @@ struct SetsByDateDetailsView: View {
                         setDeletionEnabled.toggle()
                     }
                 }) {
-                    Text(setDeletionEnabled ? "Cancel" : "Delete Set")
+                    Text(setDeletionEnabled ? "Cancel" : "Delete Set(s)")
                         .foregroundStyle(.red)
                 }
             }

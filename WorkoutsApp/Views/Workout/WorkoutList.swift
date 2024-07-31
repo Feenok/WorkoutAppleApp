@@ -36,22 +36,23 @@ struct WorkoutList: View {
                                 if workout.bestTimeMinutes != nil || workout.bestTimeSeconds != nil {
                                     Image(systemName: "stopwatch.fill")
                                         .foregroundStyle(.gray)
-                                        .font(.caption)
+                                        .font(.caption2)
                                 }
                                 if let minutes = workout.bestTimeMinutes {
                                     Text("\(minutes)")
-                                        .font(.caption)
+                                        .foregroundStyle(.gray)
+                                        .font(.caption2)
                                     Text("min")
                                         .foregroundStyle(.gray)
-                                        .font(.caption)
+                                        .font(.caption2)
                                 }
                                 if let seconds = workout.bestTimeSeconds {
                                     Text("\(seconds)")
-                                        //.foregroundStyle(.gray)
-                                        .font(.caption)
+                                        .foregroundStyle(.gray)
+                                        .font(.caption2)
                                     Text("sec")
                                         .foregroundStyle(.gray)
-                                        .font(.caption)
+                                        .font(.caption2)
                                 }
                             }
                         }

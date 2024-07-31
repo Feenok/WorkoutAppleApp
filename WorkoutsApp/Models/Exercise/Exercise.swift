@@ -35,8 +35,9 @@ final class Exercise {
     @Relationship(deleteRule: .cascade) var allSets: [ExerciseSet] = []
     
     var PRSet: ExerciseSet? // Personal Weight Record set
+    var maxVLSet: ExerciseSet? // Highest Volume Load set
     
-    func updatePRSet() {
+    func updatePRSet() { //TODO:Can make more efficient
         PRSet = allSets.max { a, b in
             if a.weight != b.weight {
                 return a.weight < b.weight
@@ -68,6 +69,7 @@ final class Exercise {
         allSets.insert(set, at: insertPosition)
         
         updatePRSet()
+        updateMaxVLSet()
     }
     
     func removeSet(_ set: ExerciseSet) {
@@ -77,6 +79,20 @@ final class Exercise {
         }
     
         updatePRSet()
+        updateMaxVLSet()
+    }
+    
+    func updateMaxVLSet() { //TODO:Can make more efficient
+        if maxVLSet == nil {
+            maxVLSet = allSets.max { ($0.weight * $0.reps) < ($1.weight * $1.reps) }
+        } else {
+            let lastSetVolumeLoad = allSets.last!.weight * allSets.last!.reps
+            let maxVL = maxVLSet!.weight * maxVLSet!.reps
+            
+            if lastSetVolumeLoad > maxVL {
+                maxVLSet = allSets.last
+            }
+        }
     }
     
     init(name: String, category: ExerciseCategory) {

@@ -72,5 +72,39 @@ class ExerciseDetailsViewModel: ObservableObject {
         return (seconds / 60, seconds % 60)
     }
     
+    // Methods to access maxVLSet information
+    var maxVolumeLoad: Int {
+        (exercise.maxVLSet?.weight ?? 0) * (exercise.maxVLSet?.reps ?? 0)
+    }
+    
+    var maxVLDate: Date {
+        exercise.maxVLSet?.date ?? Date()
+    }
+    
+    func volumeLoadForDate(_ date: Date) -> Int {
+        let dayStart = Calendar.current.startOfDay(for: date)
+        return allSetsDictionary[dayStart]?.reduce(0) { $0 + ($1.weight * $1.reps) } ?? 0
+    }
+    
+    func monthlyAverageVolumeLoad() -> Int {
+        let calendar = Calendar.current
+        let thirtyDaysAgo = calendar.date(byAdding: .day, value: -30, to: Date())!
+        
+        let recentSets = allSetsDictionary.filter { $0.key >= thirtyDaysAgo }
+        let totalVL = recentSets.values.flatMap { $0 }.reduce(0) { $0 + ($1.weight * $1.reps) }
+        let daysWithSets = recentSets.count
+        
+        return daysWithSets > 0 ? totalVL / daysWithSets : 0
+    }
+    
+    func volumeLoadPercentChange(for date: Date) -> Double {
+        let monthlyAvg = monthlyAverageVolumeLoad()
+        let currentVL = volumeLoadForDate(date)
+        
+        guard monthlyAvg > 0 else { return 0 }
+        
+        return Double(currentVL - monthlyAvg) / Double(monthlyAvg) * 100
+    }
+    
 }
 
