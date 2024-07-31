@@ -35,7 +35,9 @@ final class Exercise {
     @Relationship(deleteRule: .cascade) var allSets: [ExerciseSet] = []
     
     var PRSet: ExerciseSet? // Personal Weight Record set
-    var maxVLSet: ExerciseSet? // Highest Volume Load set
+    
+    var maxVolumeLoadDate: Date = Date()
+    var maxVolumeLoad: Int = 0
     
     func updatePRSet() { //TODO:Can make more efficient
         PRSet = allSets.max { a, b in
@@ -69,7 +71,7 @@ final class Exercise {
         allSets.insert(set, at: insertPosition)
         
         updatePRSet()
-        updateMaxVLSet()
+        updateMaxVolumeLoad()
     }
     
     func removeSet(_ set: ExerciseSet) {
@@ -77,28 +79,35 @@ final class Exercise {
         if let index = allSets.firstIndex(where: { $0.id == set.id }) {
             allSets.remove(at: index)
         }
-    
+        
         updatePRSet()
-        updateMaxVLSet()
+        updateMaxVolumeLoad()
     }
     
-    func updateMaxVLSet() { //TODO:Can make more efficient
-        if maxVLSet == nil {
-            maxVLSet = allSets.max { ($0.weight * $0.reps) < ($1.weight * $1.reps) }
-        } else {
-            let lastSetVolumeLoad = allSets.last!.weight * allSets.last!.reps
-            let maxVL = maxVLSet!.weight * maxVLSet!.reps
-            
-            if lastSetVolumeLoad > maxVL {
-                maxVLSet = allSets.last
-            }
+    func updateMaxVolumeLoad() {
+        guard !allSets.isEmpty else {
+            maxVolumeLoad = 0
+            maxVolumeLoadDate = Date()
+            return
+        }
+        
+        let groupedSets = Dictionary(grouping: allSets) { Calendar.current.startOfDay(for: $0.date) }
+        let dailyVolumes = groupedSets.mapValues { sets in
+            sets.reduce(0) { $0 + ($1.weight * $1.reps) }
+        }
+        
+        if let maxDay = dailyVolumes.max(by: { $0.value < $1.value }) {
+            maxVolumeLoad = maxDay.value
+            maxVolumeLoadDate = maxDay.key
         }
     }
     
     init(name: String, category: ExerciseCategory) {
-            self.name = name
-            self.category = category
-        }
+        self.name = name
+        self.category = category
+    }
+    
+//TODO: May need to make storing/getting/updating the pr set and max volume load set more efficient. Which includes making the Exercise/ExerciseSet classes more efficient and include sorting by date
 }
 
 
