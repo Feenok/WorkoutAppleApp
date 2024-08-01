@@ -12,6 +12,7 @@ struct ExerciseDetails: View {
     @StateObject private var vm: ExerciseDetailsViewModel
     @State var selectedDate: Date? = nil
     @State private var displayedDate: Date // Date displayed for the daily sets list
+    @State var selectedSetIndex: Int? // Set displayed for daily sets chart view
     
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
@@ -71,6 +72,7 @@ struct ExerciseDetails: View {
                         
                         //Chart
                         Group {
+                            
                             if !dailySetsChartExpanded {
                                 ExerciseChartView(vm: vm, sets: vm.allSetsDictionary, sortByWeight: sortByWeight, sortByReps: sortByReps, sortByTime: sortByTime, rawSelectedDate: $selectedDate)
                                     .onChange(of: selectedDate) { oldValue, newValue in
@@ -79,8 +81,16 @@ struct ExerciseDetails: View {
                                         }
                                     }
                             } else {
-                                ExerciseChartDailyView(vm: vm, sets: vm.allSetsDictionary, sortByWeight: sortByWeight, sortByReps: sortByReps, sortByTime: sortByTime, selectedDate: displayedDateStart)
+                                ExerciseChartDailyView(
+                                    displayedDateStart: displayedDateStart,
+                                    displayedDateSets: vm.allSetsDictionary[displayedDateStart] ?? [],
+                                    sortByWeight: sortByWeight,
+                                    sortByReps: sortByReps,
+                                    sortByTime: sortByTime,
+                                    selectedSetIndex: $selectedSetIndex
+                                )
                             }
+                             
                         }
                         .frame(height: 300)
                         .padding(.horizontal, 8)
