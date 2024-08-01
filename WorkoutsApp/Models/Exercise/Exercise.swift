@@ -108,6 +108,7 @@ final class Exercise {
     }
     
 //TODO: May need to make storing/getting/updating the pr set and max volume load set more efficient. Which includes making the Exercise/ExerciseSet classes more efficient and include sorting by date
+    
 }
 
 

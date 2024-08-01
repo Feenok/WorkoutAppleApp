@@ -72,29 +72,30 @@ class ExerciseDetailsViewModel: ObservableObject {
         return (seconds / 60, seconds % 60)
     }
     
+    private func startOfDay(for date: Date) -> Date {
+        return Calendar.current.startOfDay(for: date)
+    }
     
     // Methods to access maxVLSet information
     
     // Volume load is the TOTAL WEIGHT for date
     func volumeLoadForDate(_ date: Date) -> Int {
-        let dayStart = Calendar.current.startOfDay(for: date)
+        let dayStart = startOfDay(for: date)
         return allSetsDictionary[dayStart]?.reduce(0) { $0 + ($1.weight * $1.reps) } ?? 0
     }
     
     func totalRepsForDate(_ date: Date) -> Int {
-        let dayStart = Calendar.current.startOfDay(for: date)
-        
-        return allSetsDictionary[dayStart]!.reduce(0) { sum, set in
+        let dayStart = startOfDay(for: date)
+        return allSetsDictionary[dayStart]?.reduce(0) { sum, set in
             sum + set.reps
-        }
+        } ?? 0
     }
     
     func averageRepWeightForDate(_ date: Date) -> Int {
-        let dayStart = Calendar.current.startOfDay(for: date)
         let totalWeight = volumeLoadForDate(date)
         let totalReps = totalRepsForDate(date)
         
-        return totalWeight/totalReps
+        return totalReps > 0 ? totalWeight / totalReps : 0
     }
     
     
@@ -126,11 +127,12 @@ class ExerciseDetailsViewModel: ObservableObject {
         let thirtyDaysAgo = calendar.date(byAdding: .day, value: -30, to: Date())!
         
         let recentSets = allSetsDictionary.filter { $0.key >= thirtyDaysAgo }
-        let totalWeight = recentSets.values.flatMap { $0 }.reduce(0) { $0 + ($1.weight) }
-        let totalReps = recentSets.values.flatMap { $0 }.reduce(0) { $0 + ($1.reps) }
-        let avgWeight = totalWeight/totalReps
+        let allSets = recentSets.values.flatMap { $0 }
         
-        return avgWeight > 0 ? avgWeight : 0
+        let totalWeightTimesReps = allSets.reduce(0) { $0 + ($1.weight * $1.reps) }
+        let totalReps = allSets.reduce(0) { $0 + $1.reps }
+        
+        return totalReps > 0 ? totalWeightTimesReps / totalReps : 0
     }
     
     // Percent change from monthly average
@@ -144,6 +146,29 @@ class ExerciseDetailsViewModel: ObservableObject {
     }
     
     // REPS
+    func monthlyAverageRepsPerDay() -> Int {
+        let calendar = Calendar.current
+        let thirtyDaysAgo = calendar.date(byAdding: .day, value: -30, to: Date())!
+        
+        let recentSets = allSetsDictionary.filter { $0.key >= thirtyDaysAgo }
+        let allSets = recentSets.values.flatMap { $0 }
+        
+        let totalReps = allSets.reduce(0) { $0 + $1.reps }
+        let totalDays = recentSets.count
+        
+        return totalDays > 0 ? totalReps / totalDays : 0
+    }
+    
+    // Percent change from monthly average
+    func dailyRepsPercentChange(for date: Date) -> Double {
+        let monthlyAvg = monthlyAverageRepsPerDay()
+        let currentAverageDailyReps = totalRepsForDate(date)
+        
+        guard monthlyAvg > 0 else { return 0 }
+        
+        return Double(currentAverageDailyReps - monthlyAvg) / Double(monthlyAvg) * 100
+    }
+    
     
 }
 

@@ -24,20 +24,6 @@ struct AdditionalDataView: View {
     }
     
     var body: some View {
-        /*
-        let dayStart = Calendar.current.startOfDay(for: displayedDate)
-        
-        let totalWeight: Int = vm.allSetsDictionary[dayStart]!.reduce(0) { sum, set in
-            sum + (set.weight * set.reps)
-        }
-        let totalReps: Int = vm.allSetsDictionary[dayStart]!.reduce(0) { sum, set in
-            sum + set.reps
-        }
-        let averageRepWeight: Int = (totalWeight/totalReps)
-        let totalDuration: TimeInterval = vm.allSetsDictionary[dayStart]!.reduce(0) { sum, set in
-            sum + (set.duration ?? 0)
-        }
-         */
                 
         VStack (alignment: .leading) {
             // Additional Weight & Rep Data
@@ -62,6 +48,8 @@ struct AdditionalDataView: View {
     
     @ViewBuilder
     private var WeightAndRepData: some View {
+        let averageRepWeightMonthly = vm.monthlyAverageWeight()
+        let averageRepCountMonthly = vm.monthlyAverageRepsPerDay()
         
         HStack {
             Image(systemName: "dumbbell.fill")
@@ -74,17 +62,7 @@ struct AdditionalDataView: View {
         .padding(.horizontal)
         .padding(.bottom)
         
-        Group {
-            Text("You've completed a total of ") +
-            Text("\(totalReps)").bold() +
-            //TODO: Add percentage inc/dec
-            Text(" rep(s) with an average weight of ") +
-            Text("\(averageRepWeight)").bold() +
-            //TODO: Add percentage inc/dec
-            Text(" lbs.")
-        }
-        .padding(.horizontal)
-        .padding(.bottom, 0)
+        WeightAndRepPercentData
         
         Text("*Percent inc/dec from 30 day avg")
             .font(.caption2)
@@ -94,21 +72,62 @@ struct AdditionalDataView: View {
             .padding(.bottom)
         
         Group {
-            Text("Your average weight lifted per day over the last 30 days is " ) //+
-            //Text("\(monthlyAvgVL)").bold() +
-            //Text(" lbs." )
+            Text("Your average weight per rep over the last 30 days is approximately " ) +
+            Text("\(averageRepWeightMonthly)").bold() +
+            Text(" lbs." )
         }
         .padding(.horizontal)
         .padding(.bottom)
         
         Group {
-            Text("Your average number of total daily reps over the last 30 days is " ) //+
-            //Text("\(monthlyAvgVL)").bold() +
-            //Text(" lbs." )
+            Text("You averaged approximately ") +
+            Text("\(averageRepCountMonthly)").bold() +
+            Text(" reps per day over the last 30 days." )
         }
         .padding(.horizontal)
         .padding(.bottom)
         
+    }
+    
+    @ViewBuilder
+    private var WeightAndRepPercentData: some View {
+        let totalRepCountDaily = vm.totalRepsForDate(displayedDate)
+        let averageRepWeightDaily = vm.averageRepWeightForDate(displayedDate)
+        let weightPercentChange = vm.weightPercentChange(for: displayedDate)
+        let repPercentChange = vm.dailyRepsPercentChange(for: displayedDate)
+        
+        Group {
+            repText(totalRepCountDaily, repPercentChange) +
+            weightText(averageRepWeightDaily, weightPercentChange)
+        }
+        .padding(.horizontal)
+        .padding(.bottom, 0)
+    }
+
+    // Associated with WeightAndRepPercentData
+    private func repText(_ count: Int, _ change: Double) -> Text {
+        Text("You've completed ") +
+        Text("\(count)").bold() +
+        Text(" rep(s) (") +
+        percentChangeText(change) +
+        Text("*").foregroundStyle(.gray) +
+        Text(") ")
+    }
+
+    // Associated with WeightAndRepPercentData
+    private func weightText(_ weight: Int, _ change: Double) -> Text {
+        Text("at an average weight of ") +
+        Text("\(weight) lbs (").bold() +
+        percentChangeText(change) +
+        Text("*").foregroundStyle(.gray) +
+        Text(").")
+    }
+
+    // Associated with WeightAndRepPercentData
+    private func percentChangeText(_ change: Double) -> Text {
+        Text("\(change >= 0 ? "+" : "")\(String(format: "%.1f%%", change))")
+            .bold()
+            .foregroundStyle(change >= 0 ? .green : .red)
     }
     
     @ViewBuilder

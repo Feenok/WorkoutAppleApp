@@ -35,6 +35,8 @@ struct ExerciseDetails: View {
     @State private var sortByTime: Bool = false
     @State private var editingExercise: Bool = false
     
+    @State private var dailySetsChartExpanded: Bool = false
+    
     private var hasSetsForDate: Bool {
         let dayStart = Calendar.current.startOfDay(for: displayedDate)
         return !(vm.allSetsDictionary[dayStart]?.isEmpty ?? true)
@@ -69,15 +71,30 @@ struct ExerciseDetails: View {
                         
                         //Chart
                         Group {
-                            ExerciseChartView(vm: vm, sets: vm.allSetsDictionary, sortByWeight: sortByWeight, sortByReps: sortByReps, sortByTime: sortByTime, rawSelectedDate: $selectedDate)
-                                .onChange(of: selectedDate) { oldValue, newValue in
-                                    if let newDate = newValue {
-                                        displayedDate = newDate
+                            if !dailySetsChartExpanded {
+                                ExerciseChartView(vm: vm, sets: vm.allSetsDictionary, sortByWeight: sortByWeight, sortByReps: sortByReps, sortByTime: sortByTime, rawSelectedDate: $selectedDate)
+                                    .onChange(of: selectedDate) { oldValue, newValue in
+                                        if let newDate = newValue {
+                                            displayedDate = newDate
+                                        }
                                     }
-                                }
+                            } else {
+                                ExerciseChartDailyView(vm: vm, sets: vm.allSetsDictionary, sortByWeight: sortByWeight, sortByReps: sortByReps, sortByTime: sortByTime, selectedDate: displayedDateStart)
+                            }
                         }
                         .frame(height: 300)
                         .padding(.horizontal, 8)
+                        
+                        if let setsForDate = vm.allSetsDictionary[displayedDateStart], !setsForDate.isEmpty {
+                            Button (action: {
+                                withAnimation {
+                                    dailySetsChartExpanded.toggle()
+                                }
+                            }, label: {
+                                Text(dailySetsChartExpanded ? "Contract Daily Sets" : "Expand Daily Sets")
+                                    .font(.caption)
+                            })
+                        }
                         
                         //Latest set
                         ExerciseSetView(vm:vm, exerciseSet: vm.findLatestSet()!, setType: .latest)
