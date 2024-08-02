@@ -87,20 +87,25 @@ struct ExerciseChartDailyView: View {
                                 x: .value("Set", index + 1),
                                 y: .value("Weight", set.weight)
                             )
+                            
                         }
                         else if !sortByWeight && sortByReps && !sortByTime {
                             BarMark(
                                 x: .value("Set", index + 1),
                                 y: .value("Reps", set.reps)
                             )
+                            
                         } else if !sortByWeight && !sortByReps && sortByTime {
                             BarMark(
                                 x: .value("Set", index + 1),
                                 y: .value("Duration", set.duration ?? 0)
                             )
+                            
                         }
                     }
-                    .foregroundStyle(.blue)
+                    .foregroundStyle(.blue.opacity(0.9))
+                    .cornerRadius(5)
+                    .clipShape(Rectangle())
                     
                     
                     if let selectedSetIndex, selectedSetIndex >= 0, selectedSetIndex < displayedDateSets.count {
@@ -135,20 +140,36 @@ struct ExerciseChartDailyView: View {
                 .padding(8)
                 .chartXAxis {
                     AxisMarks(values: .stride(by: 1)) { value in
-                        if let intValue = value.as(Int.self), intValue > 0 && intValue <= displayedDateSets.count {
-                            AxisValueLabel {
-                                Text("\(intValue)")
+                        if let intValue = value.as(Int.self) {
+                            if sortedDisplayedDateSets.count > 9 {
+                                if intValue % 2 == 0 && intValue > 0 && intValue <= sortedDisplayedDateSets.count {
+                                    AxisValueLabel {
+                                        Text("\(intValue)")
+                                    }
+                                }
+                            } else {
+                                if intValue > 0 && intValue <= sortedDisplayedDateSets.count {
+                                    AxisValueLabel {
+                                        Text("\(intValue)")
+                                    }
+                                }
                             }
                             AxisTick()
                             AxisGridLine()
                         }
                     }
                 }
-                .chartXScale(domain: 1...Double(displayedDateSets.count))
+                .chartXScale(domain: 1...Double(displayedDateSets.count + 1))
                 .chartYScale(domain: 0...yAxisMax)
                 .chartYAxis {
                     AxisMarks(position: .leading)
                 }
+                .chartPlotStyle { plotArea in
+                    plotArea.padding(.horizontal, 8)
+                }
+                .animation(.easeInOut(duration: 0.2), value: sortByWeight)
+                .animation(.easeInOut(duration: 0.2), value: sortByReps)
+                .animation(.easeInOut(duration: 0.2), value: sortByTime)
                 
                 Text("Set")
                     .font(.caption)

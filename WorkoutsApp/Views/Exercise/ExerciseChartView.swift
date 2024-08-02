@@ -9,6 +9,7 @@ import Charts
 import SwiftUI
 
 struct ExerciseChartView: View {
+    @Environment(\.calendar) var calendar
     var vm: ExerciseDetailsViewModel
     var sets: [Date:[ExerciseSet]]
     
@@ -16,7 +17,6 @@ struct ExerciseChartView: View {
     var sortByReps: Bool
     var sortByTime: Bool
     
-    @Environment(\.calendar) var calendar
     @Binding var rawSelectedDate: Date?
     
     func endOfDay(for date: Date) -> Date {
@@ -223,6 +223,7 @@ struct ExerciseChartView: View {
                         }
                     }
                     .foregroundStyle(.blue)
+                    .cornerRadius(5)
                     
                     if let selectedDate {
                         RuleMark(
@@ -276,6 +277,9 @@ struct ExerciseChartView: View {
                 .chartYAxis {
                     AxisMarks(position: .leading)
                 }
+                .animation(.easeInOut(duration: 0.2), value: sortByWeight)
+                .animation(.easeInOut(duration: 0.2), value: sortByReps)
+                .animation(.easeInOut(duration: 0.2), value: sortByTime)
                 
                 Text("Date")
                     .font(.caption)

@@ -25,14 +25,23 @@ struct DailyExerciseView: View {
                     exerciseSets = fetchExercisesForDate(newValue)
                 }
                 .padding(.horizontal)
-            List {
-                ForEach(Array(exerciseSets.enumerated()), id: \.element.id) { index, set in
-                    ExerciseSetRow(set: set, index: index)
+            
+            if exerciseSets.isEmpty {
+                Spacer()
+                Text("No exercises for this date")
+                    .foregroundColor(.secondary)
+                Spacer()
+            } else {
+                List {
+                    ForEach(Array(exerciseSets.enumerated()), id: \.element.id) { index, set in
+                        ExerciseSetRow(set: set, index: index)
+                    }
+                    .onMove(perform: moveItem)
+                    .onDelete(perform: deleteItem)
                 }
-                .onMove(perform: moveItem)
-                .onDelete(perform: deleteItem)
+                .padding(.horizontal, -8)
             }
-            .padding(.horizontal, -8)
+            
             Button(action: addNewSet) {
                 Label("Add Set", systemImage: "plus")
             }
@@ -71,17 +80,28 @@ struct DailyExerciseView: View {
     }
     
     private func moveItem(from source: IndexSet, to destination: Int) {
-        var updatedSets = exerciseSets
-        updatedSets.move(fromOffsets: source, toOffset: destination)
+        // Ensure the move is valid
+        guard let sourceIndex = source.first, sourceIndex != destination else { return }
         
-        // Update dates to maintain order
-        let calendar = Calendar.current
-        let startOfDay = calendar.startOfDay(for: selectedDate)
-        for (index, set) in updatedSets.enumerated() {
-            set.date = calendar.date(byAdding: .second, value: index, to: startOfDay) ?? set.date
+        // Get the item to move
+        let itemToMove = exerciseSets[sourceIndex]
+        
+        // Remove the item from its original position
+        exerciseSets.remove(at: sourceIndex)
+        
+        // Insert the item at its new position
+        let destinationIndex = destination > sourceIndex ? destination - 1 : destination
+        exerciseSets.insert(itemToMove, at: destinationIndex)
+        
+        // Update the order of all sets
+        for (index, set) in exerciseSets.enumerated() {
+            set.date = Calendar.current.date(byAdding: .second, value: index, to: Calendar.current.startOfDay(for: selectedDate)) ?? set.date
+            
+            // If the set's exercise reference is lost, reassign it
+            if set.exercise == nil {
+                set.exercise = itemToMove.exercise
+            }
         }
-        
-        exerciseSets = updatedSets
         
         // Save changes to the model context
         do {

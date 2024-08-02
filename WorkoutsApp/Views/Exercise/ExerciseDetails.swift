@@ -102,6 +102,7 @@ struct ExerciseDetails: View {
                                     }
                                 }, label: {
                                     Text(dailySetsChartExpanded ? "Contract Daily Sets" : "Expand Daily Sets")
+                                        .foregroundStyle(dailySetsChartExpanded ? .red : .blue)
                                         .font(.caption)
                                         .padding(.top, -10)
                                         .padding(.horizontal)
