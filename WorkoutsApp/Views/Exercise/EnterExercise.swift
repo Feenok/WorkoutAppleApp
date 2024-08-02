@@ -29,7 +29,7 @@ struct EnterExercise: View {
             }
             VStack(alignment: .leading) {
                 Text("Exercise Info")
-                    .frame(width: .infinity, alignment: .leading)
+                    //.frame(width: .infinity, alignment: .leading)
                     .foregroundColor(.gray.opacity(0.5))
                 TextEditor(text: $exercise.info)
                     .frame(height: 200)
@@ -46,7 +46,7 @@ struct EnterExercise: View {
                 Button("Done") {
                     dismiss()
                 }
-                .disabled(exercise.name == "" || exercise.category == nil)
+                .disabled(exercise.name == "")
             }
             ToolbarItem(placement: .cancellationAction) {
                 Button("Cancel") {

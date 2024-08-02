@@ -13,6 +13,7 @@ struct WorkoutList: View {
     @Query private var workouts: [Workout]
     
     @State private var newWorkout: Workout?
+    @State private var addingNewWorkout: Bool = false
     
     init(workoutFilter: String = "") {
         let predicate = #Predicate<Workout> { workout in
@@ -96,9 +97,9 @@ struct WorkoutList: View {
                 }
             }
         }
-        .sheet(item: $newWorkout) { workout in
+        .sheet(isPresented: $addingNewWorkout, onDismiss: {addingNewWorkout = false}) {
             NavigationStack {
-                EnterWorkout(workout: workout)
+                EnterWorkout(workout: newWorkout ?? Workout(name: "", category: ""))
             }
             .interactiveDismissDisabled()
         }
@@ -106,9 +107,9 @@ struct WorkoutList: View {
 
     private func addWorkout() {
         withAnimation {
-            let newItem = Workout(name: "", category: "")
-            modelContext.insert(newItem)
-            newWorkout = newItem
+            newWorkout = Workout(name: "", category: "")
+            modelContext.insert(newWorkout!)
+            addingNewWorkout = true
         }
     }
 

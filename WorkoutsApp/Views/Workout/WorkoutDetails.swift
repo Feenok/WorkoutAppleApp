@@ -78,13 +78,12 @@ struct WorkoutDetails: View {
                 let setsToTrack = sortedSets.filter { set in
                     selectedSetIDs.contains(set.id)
                 }.sorted { first, second in
-                    selectedSetIDs.firstIndex(of: first.id)! < selectedSetIDs.firstIndex(of: second.id)!
+                    first.date < second.date
                 }
                 do {
                     try DataManager.shared.addWorkoutSetsToExercises(sets: setsToTrack, modelContext: modelContext)
                     selectedSetIDs.removeAll()
                 } catch {
-                    // Handle the error, perhaps show an alert to the user
                     print("Error tracking workout: \(error)")
                 }
             }

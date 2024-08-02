@@ -40,8 +40,25 @@ struct ExerciseChartView: View {
             return nil
         }
         
-        return setsForDate.max(by: { $0.weight < $1.weight })
-            .map { ($0.weight, $0.reps, $0.duration, $0.self) }
+        return setsForDate.max { a, b in
+            if a.weight != b.weight {
+                return a.weight < b.weight
+            }
+            if a.reps != b.reps {
+                return a.reps < b.reps
+            }
+            // If weight and reps are equal, compare duration
+            switch (a.duration, b.duration) {
+            case (let durationA?, let durationB?):
+                return durationA < durationB
+            case (nil, .some):
+                return true  // b is greater because it has a duration and a doesn't
+            case (.some, nil):
+                return false // a is greater because it has a duration and b doesn't
+            case (nil, nil):
+                return false // They're equal if both have no duration
+            }
+        }.map { ($0.weight, $0.reps, $0.duration, $0.self) }
     }
     
     // Get highest reps for date
@@ -51,19 +68,54 @@ struct ExerciseChartView: View {
             return nil
         }
         
-        return setsForDate.max(by: { $0.reps < $1.reps })
-            .map { ($0.weight, $0.reps, $0.duration, $0.self) }
+        return setsForDate.max { a, b in
+            if a.reps != b.reps {
+                return a.reps < b.reps
+            }
+            if a.weight != b.weight {
+                return a.weight < b.weight
+            }
+            // If reps and weight are equal, compare duration
+            switch (a.duration, b.duration) {
+            case (let durationA?, let durationB?):
+                return durationA < durationB
+            case (nil, .some):
+                return true  // b is greater because it has a duration and a doesn't
+            case (.some, nil):
+                return false // a is greater because it has a duration and b doesn't
+            case (nil, nil):
+                return false // They're equal if both have no duration
+            }
+        }.map { ($0.weight, $0.reps, $0.duration, $0.self) }
     }
     
-    // Get highest weight for date
+    // Get highest duration for date
     var selectedDateMaxDurationDetails: (weight: Int, reps: Int, duration: TimeInterval?, maxSet: ExerciseSet)? {
         guard let selectedDate = selectedDate,
               let setsForDate = sets[selectedDate] else {
             return nil
         }
         
-        return setsForDate.max(by: { $0.duration ?? 0 < $1.duration ?? 0 })
-            .map { ($0.weight, $0.reps, $0.duration, $0.self) }
+        return setsForDate.max { a, b in
+            switch (a.duration, b.duration) {
+            case (let durationA?, let durationB?):
+                if durationA != durationB {
+                    return durationA < durationB
+                }
+            case (nil, .some):
+                return true  // b is greater because it has a duration and a doesn't
+            case (.some, nil):
+                return false // a is greater because it has a duration and b doesn't
+            case (nil, nil):
+                return false // They're equal if both have no duration
+            }
+            // If durations are equal or both nil, compare weight
+            if a.weight != b.weight {
+                return a.weight < b.weight
+            }
+            // If weights are also equal, compare reps
+            return a.reps < b.reps
+        }.map { ($0.weight, $0.reps, $0.duration, $0.self) }
     }
     
     var body: some View {

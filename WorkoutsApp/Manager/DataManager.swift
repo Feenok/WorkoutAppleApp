@@ -13,22 +13,20 @@ class DataManager {
     private init() {}
     
     func addWorkoutSetsToExercises(sets: [WorkoutTemplateSet], modelContext: ModelContext) throws {
-        for templateSet in sets {
+        let baseDate = Date.now
+        for (index, templateSet) in sets.enumerated() {
             guard let exercise = try fetchExercise(name: templateSet.name, context: modelContext) else {
                 print("Exercise not found: \(templateSet.name)")
                 continue
             }
             
-            let newSet = ExerciseSet(weight: templateSet.targetWeight, reps: templateSet.targetReps, date: Date.now, exercise: exercise)
+            let setDate = baseDate.addingTimeInterval(Double(index))
+            let newSet = ExerciseSet(weight: templateSet.targetWeight, reps: templateSet.targetReps, date: setDate, exercise: exercise)
             
-            // Directly add the set to the exercise
             exercise.addSet(newSet)
-            
-            // Insert the new set into the context
             modelContext.insert(newSet)
         }
         
-        // Save changes
         try modelContext.save()
     }
     

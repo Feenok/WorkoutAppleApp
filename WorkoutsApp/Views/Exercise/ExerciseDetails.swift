@@ -56,7 +56,7 @@ struct ExerciseDetails: View {
         Group {
             if !vm.exercise.allSets.isEmpty {
                 ScrollView {
-                    VStack {
+                    VStack () {
                         //Additional exercise info
                         AdditionalExerciseInfoView(vm: vm, showingInfo: $showingInfo)
                         
@@ -72,7 +72,6 @@ struct ExerciseDetails: View {
                         
                         //Chart
                         Group {
-                            
                             if !dailySetsChartExpanded {
                                 ExerciseChartView(vm: vm, sets: vm.allSetsDictionary, sortByWeight: sortByWeight, sortByReps: sortByReps, sortByTime: sortByTime, rawSelectedDate: $selectedDate)
                                     .onChange(of: selectedDate) { oldValue, newValue in
@@ -90,20 +89,25 @@ struct ExerciseDetails: View {
                                     selectedSetIndex: $selectedSetIndex
                                 )
                             }
-                             
                         }
                         .frame(height: 300)
                         .padding(.horizontal, 8)
                         
                         if let setsForDate = vm.allSetsDictionary[displayedDateStart], !setsForDate.isEmpty {
-                            Button (action: {
-                                withAnimation {
-                                    dailySetsChartExpanded.toggle()
-                                }
-                            }, label: {
-                                Text(dailySetsChartExpanded ? "Contract Daily Sets" : "Expand Daily Sets")
-                                    .font(.caption)
-                            })
+                            HStack {
+                                Spacer()
+                                Button (action: {
+                                    withAnimation {
+                                        dailySetsChartExpanded.toggle()
+                                    }
+                                }, label: {
+                                    Text(dailySetsChartExpanded ? "Contract Daily Sets" : "Expand Daily Sets")
+                                        .font(.caption)
+                                        .padding(.top, -10)
+                                        .padding(.horizontal)
+                                        .zIndex(2)
+                                })
+                            }
                         }
                         
                         //Latest set
@@ -196,7 +200,6 @@ struct ExerciseDetails: View {
             NavigationStack {
                 EditExercise(exercise: vm.exercise)
             }
-            //.interactiveDismissDisabled()
         }
         .safeAreaInset(edge: .bottom) {
             if insetExpanded {
@@ -357,7 +360,6 @@ struct ExerciseSetView: View {
         case greatest
     }
     
-    
     var vm: ExerciseDetailsViewModel
     var exerciseSet: ExerciseSet
     var setType: SetStanding
@@ -435,7 +437,6 @@ struct SetsByDateDetailsView: View {
     @State private var setToDelete: (set: ExerciseSet, index: Int)?
     var hasSetsForDate: Bool
      
-    
     let padding: CGFloat = -4
     
     var body: some View {
@@ -457,7 +458,6 @@ struct SetsByDateDetailsView: View {
                 Text("No sets for this date")
                     .foregroundColor(.secondary)
             }
-            
             // Delete sets button
             if hasSetsForDate {
                 Button(action: {
@@ -469,7 +469,6 @@ struct SetsByDateDetailsView: View {
                         .foregroundStyle(.red)
                 }
             }
-            
         }
         .padding(.horizontal)
         .cornerRadius(10)
@@ -565,7 +564,6 @@ struct SetDetailRow: View {
             }
         }
     }
-    
 }
 
 struct DurationView: View {

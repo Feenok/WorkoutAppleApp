@@ -23,7 +23,7 @@ struct EnterWorkout: View {
             TextField("Workout name", text: $workout.name)
             VStack(alignment: .leading) {
                 Text("Workout Info")
-                    .frame(width: .infinity, alignment: .leading)
+                    //.frame(width: .infinity, alignment: .leading)
                     .foregroundColor(.gray.opacity(0.5))
                 TextEditor(text: $workout.info)
                     .frame(height: 200)

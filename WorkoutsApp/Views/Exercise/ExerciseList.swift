@@ -13,6 +13,7 @@ struct ExerciseList: View {
     @Query private var exercises: [Exercise]
     
     @State private var newExercise: Exercise?
+    @State private var addingNewExercise: Bool = false
     
     @State private var selectedCategory: ExerciseCategory?
     @State private var isDropdownVisible = false
@@ -75,7 +76,9 @@ struct ExerciseList: View {
         .toolbar {
             if !exercises.isEmpty {
                 ToolbarItem {
-                    Button(action: addExercise) {
+                    Button(action:
+                        addExercise
+                    ) {
                         Image(systemName: "plus")
                             .foregroundStyle(.blue)
                     }
@@ -98,9 +101,9 @@ struct ExerciseList: View {
                 }
             }
         }
-        .sheet(item: $newExercise) { exercise in
+        .sheet(isPresented: $addingNewExercise, onDismiss: {addingNewExercise = false}) {
             NavigationStack {
-                EnterExercise(exercise: exercise)
+                EnterExercise(exercise: newExercise ?? Exercise(name: "", category: ExerciseCategory.misc))
             }
             .interactiveDismissDisabled()
         }
@@ -110,6 +113,7 @@ struct ExerciseList: View {
         withAnimation {
             newExercise = Exercise(name: "", category: ExerciseCategory.misc)
             modelContext.insert(newExercise!)
+            addingNewExercise = true
         }
     }
 
