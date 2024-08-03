@@ -162,7 +162,7 @@ struct ExerciseDetails: View {
                         .padding()
                     Spacer()
                     Text("No Sets")
-                        .bold()
+                        .foregroundColor(.secondary)
                     Spacer()
                     
                     Button(action: {
@@ -185,7 +185,7 @@ struct ExerciseDetails: View {
                 }
             }
         }
-        .navigationTitle("\(vm.exercise.name)")
+        .navigationTitle((vm.exercise.name))
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button {

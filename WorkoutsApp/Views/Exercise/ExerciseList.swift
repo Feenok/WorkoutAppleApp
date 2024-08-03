@@ -56,8 +56,7 @@ struct ExerciseList: View {
                 VStack {
                     Spacer()
                     Text("No Exercises")
-                        .font(.title3)
-                        .bold()
+                        .foregroundColor(.secondary)
                     Spacer()
                     Button(action: addExercise) {
                         HStack (spacing: 5) {
@@ -77,7 +76,7 @@ struct ExerciseList: View {
             if !exercises.isEmpty {
                 ToolbarItem {
                     Button(action:
-                        addExercise
+                            addExercise
                     ) {
                         Image(systemName: "plus")
                             .foregroundStyle(.blue)

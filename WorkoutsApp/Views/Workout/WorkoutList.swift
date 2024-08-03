@@ -64,8 +64,7 @@ struct WorkoutList: View {
                 VStack {
                     Spacer()
                     Text("No Workouts")
-                        .font(.title3)
-                        .bold()
+                        .foregroundColor(.secondary)
                     Spacer()
                     Button(action: addWorkout) {
                         HStack (spacing: 5) {
