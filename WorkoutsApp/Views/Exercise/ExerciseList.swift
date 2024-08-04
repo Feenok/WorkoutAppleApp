@@ -18,6 +18,9 @@ struct ExerciseList: View {
     @State private var selectedCategory: ExerciseCategory?
     @State private var isDropdownVisible = false
     
+    @State private var showingDeleteConfirmation = false
+    @State private var exerciseToDelete: Exercise?
+    
     let exerciseFilter: String
     
     init(exerciseFilter: String = "") {
@@ -106,6 +109,18 @@ struct ExerciseList: View {
             }
             .interactiveDismissDisabled()
         }
+        .confirmationDialog("Are you sure you want to delete this exercise?",
+                            isPresented: $showingDeleteConfirmation,
+                            presenting: exerciseToDelete) { exercise in
+            Button("Delete", role: .destructive) {
+                withAnimation {
+                    modelContext.delete(exercise)
+                    try? modelContext.save()
+                }
+            }
+        } message: { exercise in
+            Text("Are you sure you want to delete '\(exercise.name)'?")
+        }
     }
 
     private func addExercise() {
@@ -115,13 +130,11 @@ struct ExerciseList: View {
             addingNewExercise = true
         }
     }
-
+    
     private func deleteExercises(offsets: IndexSet) {
-        withAnimation {
-            for index in offsets {
-                modelContext.delete(exercises[index])
-            }
-        }
+        guard let index = offsets.first else { return }
+        exerciseToDelete = filteredExercises[index]
+        showingDeleteConfirmation = true
     }
     
 }

@@ -21,6 +21,8 @@ struct WorkoutDetails: View {
     @State private var showingInfo: Bool = false
     @State private var editingName: Bool = false
     
+    //@State private var notificationOffset: CGFloat = -50 // Start above the screen
+    //@State private var showingTrackingNotification = false
     
     @FocusState private var focusedField: UUID?
     
@@ -32,13 +34,14 @@ struct WorkoutDetails: View {
         Button(isEditing ? "Done" : "Edit"){
             withAnimation {
                 isEditing.toggle()
+                focusedField = nil
             }
         }
         .foregroundColor(isEditing ? .red : .blue)
     }
     
     var body: some View {
-        Group {
+        VStack {
             if !workout.templateSets.isEmpty {
                     workoutList
             } else {
@@ -86,7 +89,7 @@ struct WorkoutDetails: View {
                 do {
                     try DataManager.shared.addWorkoutSetsToExercises(sets: setsToTrack, modelContext: modelContext)
                     selectedSetIDs.removeAll()
-                    //trackingAllSets = false
+                    //showNotification()
                 } catch {
                     print("Error tracking workout: \(error)")
                 }
@@ -217,21 +220,22 @@ struct WorkoutDetails: View {
                 }
             } else {
                 AdditionalInfoView(showingInfo: $showingInfo, workout: workout)
+                    .padding(.horizontal)
                 if let minutes = workout.bestTimeMinutes, let seconds = workout.bestTimeSeconds {
                     Text("Best Time: \(minutes) min \(seconds) sec")
                         .font(.callout)
                         .foregroundStyle(.gray)
-                        //.bold()
+                    //.bold()
                 } else if let minutes = workout.bestTimeMinutes {
                     Text("Best Time: \(minutes) min")
                         .font(.callout)
                         .foregroundStyle(.gray)
-                        //.bold()
+                    //.bold()
                 } else if let seconds = workout.bestTimeSeconds {
                     Text("Best Time: \(seconds) sec")
                         .font(.callout)
                         .foregroundStyle(.gray)
-                        //.bold()
+                    //.bold()
                 }
             }
             
@@ -248,14 +252,15 @@ struct WorkoutDetails: View {
             }, label: {
                 if selectedSetIDs.isEmpty {
                     HStack(spacing: 2) {
-                        Image(systemName: "plus")
+                        //Image(systemName: "plus")
                         Text("Select All Sets")
                     }
                 } else {
                     HStack(spacing: 2) {
-                        Image(systemName: "minus")
-                        Text("Unselect Sets")
+                        //Image(systemName: "minus")
+                        Text("Deselect Sets")
                     }
+                    .foregroundStyle(.red)
                 }
             })
             .disabled(sortedSets.isEmpty)
@@ -263,90 +268,15 @@ struct WorkoutDetails: View {
             .padding(.bottom, 0)
             .font(.subheadline)
             
+            
             List {
-                /*
-                ForEach(Array(sortedSets.enumerated()), id: \.element.id) { index, set in
-                    VStack {
-                        HStack (spacing: 2) {
-                            Text("\(index + 1).")
-                            Text("\(set.name)".uppercased())
-                        }
-                        .foregroundStyle(.secondary)
-                        .font(.caption2)
-                        .padding(.horizontal)
-                        .padding(.bottom, -4)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        
-                            HStack {
-                                TextField("Weight", value: Binding(
-                                    get: { set.targetWeight },
-                                    set: { set.targetWeight = $0 }
-                                ), formatter: NumberFormatter())
-                                .multilineTextAlignment(.center)
-                                .frame(width: 50)
-                                .padding(.vertical, -1)
-                                .padding(.trailing, 3)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 8)
-                                        .stroke(Color.secondary, lineWidth: 1)  // Border around the TextField
-                                )
-                                .keyboardType(.numberPad)
-                                Text("LBS")
-                                    .foregroundStyle(.secondary)
-                                    .font(.caption)
-                                
-                                Spacer()
-                                TextField("Reps", value: Binding(
-                                    get: { set.targetReps },
-                                    set: { set.targetReps = $0 }
-                                ), formatter: NumberFormatter())
-                                .multilineTextAlignment(.center)
-                                .frame(width: 50)
-                                .padding(.vertical, -1)
-                                .padding(.trailing, 3)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 8)
-                                        .stroke(Color.secondary, lineWidth: 1)  // Border around the TextField
-                                )
-                                .keyboardType(.numberPad)
-                                Text("REPS")
-                                    .foregroundStyle(.secondary)
-                                    .font(.caption)
-                                
-                            }
-                            .transition(.blurReplace)
-                            .padding()
-                            .background {
-                                RoundedRectangle(cornerRadius: 16)
-                                //.foregroundStyle(Color.secondary.opacity(0.2))
-                                .fill(selectedSetIDs.contains(set.id) ? Color.blue.opacity(0.6) : Color.secondary.opacity(0.2))
-                            }
-                        
-                    }
-                    .listRowSeparator(.hidden)
-                    .listRowBackground(Color.clear)
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        //if isEditing {
-                            if let index = selectedSetIDs.firstIndex(of: set.id) {
-                                selectedSetIDs.remove(at: index)
-                            } else {
-                                selectedSetIDs.append(set.id)
-                            }
-                        //}
-                    }
-                }
-                .onMove(perform: moveWorkoutSets)
-                .onDelete(perform: deleteWorkoutSets)
-                 */
-                
                 ForEach(Array(sortedSets.enumerated()), id: \.element.id) { index, set in
                     VStack {
                         HStack(spacing: 2) {
                             Text("\(index + 1).")
                             Text("\(set.name)".uppercased())
                         }
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.primary)
                         .font(.caption2)
                         .padding(.horizontal)
                         .padding(.bottom, -4)
@@ -356,7 +286,7 @@ struct WorkoutDetails: View {
                             RoundedRectangle(cornerRadius: 16)
                                 .fill(selectedSetIDs.contains(set.id) ? Color.blue.opacity(0.6) : Color.secondary.opacity(0.2))
                                 .onTapGesture {
-                                    focusedField = nil
+                                    //focusedField = nil
                                     if let index = selectedSetIDs.firstIndex(of: set.id) {
                                         selectedSetIDs.remove(at: index)
                                     } else {
@@ -365,7 +295,7 @@ struct WorkoutDetails: View {
                                 }
                             
                             HStack {
-                                TextField("Weight", value: Binding(
+                                TextField("", value: Binding(
                                     get: { set.targetWeight },
                                     set: { set.targetWeight = $0 }
                                 ), formatter: NumberFormatter())
@@ -381,7 +311,7 @@ struct WorkoutDetails: View {
                                 .keyboardType(.numberPad)
                                 
                                 .background(Color.white.opacity(0.001))
-                                .onTapGesture { }
+                                .onTapGesture { focusedField == nil ? isEditing.toggle() : nil }
                                 
                                 Text("LBS")
                                     .foregroundStyle(.secondary)
@@ -389,7 +319,7 @@ struct WorkoutDetails: View {
                                 
                                 Spacer()
                                 
-                                TextField("Reps", value: Binding(
+                                TextField("", value: Binding(
                                     get: { set.targetReps },
                                     set: { set.targetReps = $0 }
                                 ), formatter: NumberFormatter())
@@ -404,7 +334,7 @@ struct WorkoutDetails: View {
                                 )
                                 .keyboardType(.numberPad)
                                 .background(Color.white.opacity(0.001))
-                                .onTapGesture { }
+                                .onTapGesture { focusedField == nil ? isEditing.toggle() : nil }
                                 
                                 Text("REPS")
                                     .foregroundStyle(.secondary)
@@ -448,14 +378,17 @@ struct WorkoutDetails: View {
                     .foregroundColor(.blue)
                     Spacer()
                 }
+                .listRowSeparator(.hidden)
             }
             .listStyle(PlainListStyle())
+            
             
             Button(action: { showingAlert = true }) {
                 Label("Track Selected Sets (\(selectedSetIDs.count))", systemImage: "checkmark.circle")
                     .padding(.vertical)
             }
             .disabled(selectedSetIDs.isEmpty)
+        
         }
     }
     
@@ -479,7 +412,7 @@ struct AdditionalInfoView: View {
                         .font(.caption)
                         .padding(.bottom)
                         .padding(.top, -2)
-                        .padding(.horizontal)
+                        //.padding(.horizontal)
                 }
                 Spacer()
             }
@@ -496,13 +429,14 @@ struct AdditionalInfoView: View {
                             .font(.caption)
                             .foregroundStyle(.red)
                             .padding(.top, -2)
-                            .padding(.horizontal)
+                            //.padding(.horizontal)
                     }
                     Spacer()
                 }
                 
                 Text("\(workout.info)")
                     .font(.body)
+                    .padding(.top, 2)
                     .padding(.bottom)
             }
         }

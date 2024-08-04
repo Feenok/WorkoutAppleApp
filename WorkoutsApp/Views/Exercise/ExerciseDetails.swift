@@ -283,7 +283,7 @@ struct AddNewSetView: View {
             }
             DatePicker(selection: $newSetDate, in: ...today, displayedComponents: .date) {
                 HStack {
-                    TextField("Weight", text: Binding(
+                    TextField("Weight (lbs)", text: Binding(
                         get: { self.newSetWeight ?? "" },
                         set: { self.newSetWeight = $0.isEmpty ? nil : $0 }
                     ))

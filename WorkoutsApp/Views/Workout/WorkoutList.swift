@@ -15,6 +15,9 @@ struct WorkoutList: View {
     @State private var newWorkout: Workout?
     @State private var addingNewWorkout: Bool = false
     
+    @State private var showingDeleteConfirmation = false
+    @State private var workoutToDelete: Workout?
+    
     init(workoutFilter: String = "") {
         let predicate = #Predicate<Workout> { workout in
             workoutFilter.isEmpty || workout.name.localizedStandardContains(workoutFilter)
@@ -102,6 +105,18 @@ struct WorkoutList: View {
             }
             .interactiveDismissDisabled()
         }
+        .confirmationDialog("Are you sure you want to delete this workout?",
+                            isPresented: $showingDeleteConfirmation,
+                            presenting: workoutToDelete) { workout in
+            Button("Delete", role: .destructive) {
+                withAnimation {
+                    modelContext.delete(workout)
+                    try? modelContext.save()
+                }
+            }
+        } message: { workout in
+            Text("Are you sure you want to delete '\(workout.name)'?")
+        }
     }
 
     private func addWorkout() {
@@ -112,11 +127,19 @@ struct WorkoutList: View {
         }
     }
 
+    /*
     private func deleteWorkouts(offsets: IndexSet) {
         withAnimation {
             for index in offsets {
                 modelContext.delete(workouts[index])
             }
         }
+    }
+     */
+    
+    private func deleteWorkouts(offsets: IndexSet) {
+        guard let index = offsets.first else { return }
+        workoutToDelete = workouts[index]
+        showingDeleteConfirmation = true
     }
 }
