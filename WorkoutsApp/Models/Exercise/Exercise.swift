@@ -10,7 +10,8 @@ import SwiftData
 
 enum ExerciseCategory: String, CaseIterable, Codable, Identifiable {
     case chest
-    case back
+    case upperBack
+    case lowerBack
     case shoulders
     case biceps
     case triceps
@@ -26,18 +27,43 @@ enum ExerciseCategory: String, CaseIterable, Codable, Identifiable {
     var id: String { self.rawValue }
 }
 
+enum MuscleGroups: String, CaseIterable, Codable, Identifiable {
+    case upperBodyPull // back, biceps
+    case upperBodyPush // chest, triceps
+    case shouldersAndTraps // shoulders, traps
+    case lowerBody // quads, hamstrings, glutes, calves
+    case core // abs, lowerback
+    case misc // forearms, misc
+    
+    var id: String { self.rawValue }
+}
+
 @Model
 final class Exercise {
     var name: String
     var category: ExerciseCategory
     var info: String = ""
-    
     @Relationship(deleteRule: .cascade) var allSets: [ExerciseSet] = []
-    
     var PRSet: ExerciseSet? // Personal Weight Record set
-    
     var maxVolumeLoadDate: Date = Date()
     var maxVolumeLoad: Int = 0
+    
+    var muscleGroupTargeted: MuscleGroups {
+            switch self.category {
+            case .chest, .triceps:
+                return .upperBodyPush
+            case .upperBack, .biceps:
+                return .upperBodyPull
+            case .shoulders, .traps:
+                return .shouldersAndTraps
+            case .quads, .hamstrings, .glutes, .calves:
+                return .lowerBody
+            case .abs, .lowerBack:
+                return .core
+            case .forearms, .misc:
+                return .misc
+            }
+        }
     
     func updatePRSet() { //TODO:Can make more efficient
         PRSet = allSets.max { a, b in

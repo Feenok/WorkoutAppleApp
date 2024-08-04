@@ -9,13 +9,14 @@ import SwiftUI
 import SwiftData
 
 struct DailyExerciseView: View {
+    @Environment(\.modelContext) private var modelContext
     @Query private var allExercises: [Exercise]
     @State private var selectedDate: Date = Date()
     @State private var exerciseSets: [ExerciseSet] = []
-    @Environment(\.modelContext) private var modelContext
     
     @State private var addingNewSet: Bool = false
     @State private var newSet: ExerciseSet?
+    @State private var showingAdditionalData: Bool = false
     
     var body: some View {
         VStack {
@@ -51,11 +52,25 @@ struct DailyExerciseView: View {
         .onAppear {
             exerciseSets = fetchExercisesForDate(selectedDate)
         }
+        .toolbar {
+            if !exerciseSets.isEmpty {
+                ToolbarItem {
+                    Button("View Additional Data") {
+                        showingAdditionalData.toggle()
+                    }
+                }
+            }
+        }
         .sheet(isPresented: $addingNewSet) {
             NavigationStack {
                 EnterSet(date: selectedDate, newSet: $newSet)
             }
             .interactiveDismissDisabled()
+        }
+        .sheet(isPresented: $showingAdditionalData, onDismiss: {
+            showingAdditionalData = false
+        }) {
+            DailyExerciseAdditionalData(exerciseSets: exerciseSets)
         }
         .onChange(of: newSet) { oldValue, newValue in
             if let newSet = newValue {
