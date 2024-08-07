@@ -12,11 +12,8 @@
 		E902DE202C5AF97600345917 /* ExerciseChartDailyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E902DE1F2C5AF97600345917 /* ExerciseChartDailyView.swift */; };
 		E93218ED2C515D15006C249F /* EditExercise.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93218EC2C515D15006C249F /* EditExercise.swift */; };
 		E93218F02C51668C006C249F /* DailyExerciseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93218EF2C51668C006C249F /* DailyExerciseView.swift */; };
-		E93218F32C52C39E006C249F /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93218F22C52C39D006C249F /* Models.swift */; };
-		E93218F52C52C3AA006C249F /* ViewModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93218F42C52C3AA006C249F /* ViewModels.swift */; };
-		E93218F72C52C3BC006C249F /* Views.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93218F62C52C3BC006C249F /* Views.swift */; };
-		E93218F92C52C3C9006C249F /* DataManagers.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93218F82C52C3C8006C249F /* DataManagers.swift */; };
 		E93D43F62C5FEB3100B014D9 /* DailyExerciseAdditionalData.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93D43F52C5FEB3100B014D9 /* DailyExerciseAdditionalData.swift */; };
+		E93D43F82C60709C00B014D9 /* TestDataGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93D43F72C60709C00B014D9 /* TestDataGenerator.swift */; };
 		E9AA5CBF2C4D4B2F00805A71 /* WorkoutList.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9AA5CBE2C4D4B2E00805A71 /* WorkoutList.swift */; };
 		E9AA5CC12C4D4B8E00805A71 /* StopwatchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9AA5CC02C4D4B8E00805A71 /* StopwatchView.swift */; };
 		E9AA5CC62C4D4C9300805A71 /* FilteredWorkoutList.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9AA5CC52C4D4C9300805A71 /* FilteredWorkoutList.swift */; };
@@ -47,11 +44,10 @@
 		E902DE1F2C5AF97600345917 /* ExerciseChartDailyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseChartDailyView.swift; sourceTree = "<group>"; };
 		E93218EC2C515D15006C249F /* EditExercise.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditExercise.swift; sourceTree = "<group>"; };
 		E93218EF2C51668C006C249F /* DailyExerciseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyExerciseView.swift; sourceTree = "<group>"; };
-		E93218F22C52C39D006C249F /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
-		E93218F42C52C3AA006C249F /* ViewModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewModels.swift; sourceTree = "<group>"; };
-		E93218F62C52C3BC006C249F /* Views.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views.swift; sourceTree = "<group>"; };
-		E93218F82C52C3C8006C249F /* DataManagers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataManagers.swift; sourceTree = "<group>"; };
 		E93D43F52C5FEB3100B014D9 /* DailyExerciseAdditionalData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyExerciseAdditionalData.swift; sourceTree = "<group>"; };
+		E93D43F72C60709C00B014D9 /* TestDataGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestDataGenerator.swift; sourceTree = "<group>"; };
+		E93D43FC2C61BB3F00B014D9 /* WorkoutsApp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = WorkoutsApp.entitlements; sourceTree = "<group>"; };
+		E93D44012C63074100B014D9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		E9AA5CBE2C4D4B2E00805A71 /* WorkoutList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutList.swift; sourceTree = "<group>"; };
 		E9AA5CC02C4D4B8E00805A71 /* StopwatchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StopwatchView.swift; sourceTree = "<group>"; };
 		E9AA5CC52C4D4C9300805A71 /* FilteredWorkoutList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilteredWorkoutList.swift; sourceTree = "<group>"; };
@@ -97,20 +93,10 @@
 			path = DailyExerciseView;
 			sourceTree = "<group>";
 		};
-		E93218F12C52C37B006C249F /* ClaudeFiles */ = {
-			isa = PBXGroup;
-			children = (
-				E93218F82C52C3C8006C249F /* DataManagers.swift */,
-				E93218F22C52C39D006C249F /* Models.swift */,
-				E93218F42C52C3AA006C249F /* ViewModels.swift */,
-				E93218F62C52C3BC006C249F /* Views.swift */,
-			);
-			path = ClaudeFiles;
-			sourceTree = "<group>";
-		};
 		E9AA5CB42C474DA100805A71 /* Data */ = {
 			isa = PBXGroup;
 			children = (
+				E93D43F72C60709C00B014D9 /* TestDataGenerator.swift */,
 			);
 			path = Data;
 			sourceTree = "<group>";
@@ -197,7 +183,8 @@
 		E9C9C4F82C40D1F2003B1119 /* WorkoutsApp */ = {
 			isa = PBXGroup;
 			children = (
-				E93218F12C52C37B006C249F /* ClaudeFiles */,
+				E93D44012C63074100B014D9 /* Info.plist */,
+				E93D43FC2C61BB3F00B014D9 /* WorkoutsApp.entitlements */,
 				E9AA5CDC2C4F41F900805A71 /* Manager */,
 				E9AA5CB42C474DA100805A71 /* Data */,
 				E9C9C51C2C42EF04003B1119 /* ViewModels */,
@@ -257,6 +244,7 @@
 				E9C9C4F22C40D1F1003B1119 /* Sources */,
 				E9C9C4F32C40D1F1003B1119 /* Frameworks */,
 				E9C9C4F42C40D1F1003B1119 /* Resources */,
+				E93D43FB2C617BEB00B014D9 /* Update Claude Files */,
 			);
 			buildRules = (
 			);
@@ -316,6 +304,27 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		E93D43FB2C617BEB00B014D9 /* Update Claude Files */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Update Claude Files";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n#!/bin/bash\n\necho \"Script is running\" > /tmp/xcode_build_script_log.txt\nenv >> /tmp/xcode_build_script_log.txt\n\n# Define source and destination directories\nSOURCE_DIR=\"${SRCROOT}/Users/ernestmargariti/Desktop/AppleApps/WorkoutsApp\"\nDEST_DIR=\"${SRCROOT}/Users/ernestmargariti/Downloads\"\n\n# Ensure the destination directory exists\nmkdir -p \"$DEST_DIR\"\n\n# Function to update a Claude file\nupdate_claude_file() {\n    local output_file=\"$DEST_DIR/$1\"\n    echo \"Updating $1...\"\n    \n    # Clear the file\n    > \"$output_file\"\n    \n    # Concatenate relevant files\n    for file in \"${@:2}\"; do\n        echo \"// File: $file\" >> \"$output_file\"\n        cat \"$SOURCE_DIR/$file\" >> \"$output_file\"\n        echo -e \"\\n\\n\" >> \"$output_file\"\n    done\n}\n\n# Update Claude files\nupdate_claude_file \"ClaudeWorkoutsAppModels.swift\" \"Workout.swift\" \"WorkoutTemplateSet.swift\" \"Exercise.swift\" \"ExerciseSet.swift\"\nupdate_claude_file \"ClaudeWorkoutsAppViews.swift\" \"ContentView.swift\" \"ExerciseList.swift\" \"EnterExercise.swift\" \"ExerciseDetails.swift\" \"FilteredExerciseList.swift\" \"ExerciseChartView.swift\" \"EditExercise.swift\" \"AdditionalDataView.swift\" \"ExerciseChartDailyView.swift\" \"WorkoutList.swift\" \"FilteredWorkoutList.swift\" \"WorkoutDetails.swift\" \"EnterWorkout.swift\" \"EnterWorkoutSet.swift\" \"EditWorkout.swift\" \"DailyExerciseView.swift\" \"DailyExerciseAdditionalData.swift\"\nupdate_claude_file \"ClaudeWorkoutsAppViewModels.swift\" \"ExerciseDetailsViewModel.swift\"\nupdate_claude_file \"ClaudeWorkoutsAppDataManagers.swift\" \"DataManager.swift\"\n\necho \"Claude files updated successfully.\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		E9C9C4F22C40D1F1003B1119 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -324,24 +333,21 @@
 				E9AA5CCA2C4D4E4600805A71 /* WorkoutDetails.swift in Sources */,
 				E9AA5CD92C4DF40500805A71 /* DataManager.swift in Sources */,
 				E9C9C5162C42024E003B1119 /* ExerciseDetails.swift in Sources */,
-				E93218F32C52C39E006C249F /* Models.swift in Sources */,
 				E9D3A9632C44780000C46DE0 /* ExerciseChartView.swift in Sources */,
 				E9C9C50A2C40D743003B1119 /* EnterExercise.swift in Sources */,
-				E93218F72C52C3BC006C249F /* Views.swift in Sources */,
 				E9AA5CBF2C4D4B2F00805A71 /* WorkoutList.swift in Sources */,
-				E93218F52C52C3AA006C249F /* ViewModels.swift in Sources */,
 				E902DE1C2C59443400345917 /* EditWorkout.swift in Sources */,
 				E9C9C4FC2C40D1F2003B1119 /* ExerciseList.swift in Sources */,
 				E9AA5CC12C4D4B8E00805A71 /* StopwatchView.swift in Sources */,
 				E9AA5CC62C4D4C9300805A71 /* FilteredWorkoutList.swift in Sources */,
 				E9AA5CDB2C4EBD3200805A71 /* EnterWorkoutSet.swift in Sources */,
 				E9AA5CD72C4D8A4800805A71 /* WorkoutTemplateSet.swift in Sources */,
+				E93D43F82C60709C00B014D9 /* TestDataGenerator.swift in Sources */,
 				E93218ED2C515D15006C249F /* EditExercise.swift in Sources */,
 				E93218F02C51668C006C249F /* DailyExerciseView.swift in Sources */,
 				E9AA5CC82C4D4D0600805A71 /* Workout.swift in Sources */,
 				E9C9C5142C40DE67003B1119 /* FilteredExerciseList.swift in Sources */,
 				E9C9C5102C40DCD3003B1119 /* ContentView.swift in Sources */,
-				E93218F92C52C3C9006C249F /* DataManagers.swift in Sources */,
 				E9C9C4FE2C40D1F2003B1119 /* Exercise.swift in Sources */,
 				E93D43F62C5FEB3100B014D9 /* DailyExerciseAdditionalData.swift in Sources */,
 				E9AA5CCC2C4D4EC900805A71 /* EnterWorkout.swift in Sources */,
@@ -481,12 +487,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = WorkoutsApp/WorkoutsApp.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"WorkoutsApp/Preview Content\"";
 				DEVELOPMENT_TEAM = K5WV36G782;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = WorkoutsApp/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -510,12 +518,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = WorkoutsApp/WorkoutsApp.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"WorkoutsApp/Preview Content\"";
 				DEVELOPMENT_TEAM = K5WV36G782;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = WorkoutsApp/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

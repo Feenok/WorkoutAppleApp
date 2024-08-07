@@ -130,7 +130,7 @@ struct DailyExerciseView: View {
         for index in offsets {
             let setToDelete = exerciseSets[index]
             if let exercise = setToDelete.exercise {
-                exercise.removeSet(setToDelete) 
+                exercise.removeSet(setToDelete)
                 modelContext.delete(setToDelete)
             }
         }

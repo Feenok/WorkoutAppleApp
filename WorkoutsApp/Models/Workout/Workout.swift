@@ -20,10 +20,10 @@ final class Workout {
     
     
     init(name: String, category: String, bestTimeMinutes: Int? = nil, bestTimeSeconds: Int? = nil) {
-            self.name = name
-            self.category = category
-            self.bestTimeMinutes = bestTimeMinutes
-            self.bestTimeSeconds = bestTimeSeconds
-        }
+        self.name = name
+        self.category = category
+        self.bestTimeMinutes = bestTimeMinutes
+        self.bestTimeSeconds = bestTimeSeconds
+    }
     
 }

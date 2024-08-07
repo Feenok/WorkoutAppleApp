@@ -22,7 +22,7 @@ class ExerciseDetailsViewModel: ObservableObject {
     }
     
     private func initializeSetsDictionary() {
-        allSetsDictionary = Dictionary(grouping: exercise.allSets) { Calendar.current.startOfDay(for: $0.date) }
+        allSetsDictionary = Dictionary(grouping: exercise.allSets!) { Calendar.current.startOfDay(for: $0.date) }
     }
     
     func addSet(newSet: ExerciseSet) {
@@ -44,7 +44,7 @@ class ExerciseDetailsViewModel: ObservableObject {
     }
     
     func findLatestSet(consideringLast count: Int = 100) -> ExerciseSet? {
-        exercise.allSets.suffix(count).max(by: { $0.date < $1.date })
+        exercise.allSets!.suffix(count).max(by: { $0.date < $1.date })
     }
     
     func deleteSet(_ set: ExerciseSet) {

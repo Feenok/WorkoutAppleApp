@@ -45,12 +45,14 @@ import BackgroundTasks
 @main
 struct WorkoutsAppApp: App {
     @StateObject private var stopwatchManager = StopwatchManager()
+    @Environment(\.modelContext) private var modelContext //TODO: DELETE once testing
     
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             Exercise.self,
             ExerciseSet.self,
-            Workout.self
+            Workout.self,
+            WorkoutTemplateSet.self
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
@@ -69,8 +71,24 @@ struct WorkoutsAppApp: App {
         WindowGroup {
             ContentView()
                 .environmentObject(stopwatchManager)
+                .onAppear { //TODO: Delete once testing
+                    if UserDefaults.standard.bool(forKey: "hasGeneratedTestData") == false {
+                        Task {
+                            await generateTestData()
+                        }
+                    }
+                }
         }
         .modelContainer(sharedModelContainer)
+    }
+    
+    //TODO: Delete once done testing
+    func generateTestData() async {
+        await MainActor.run {
+            let context = sharedModelContainer.mainContext
+            TestDataGenerator.generateTestData(modelContext: context)
+            UserDefaults.standard.set(true, forKey: "hasGeneratedTestData")
+        }
     }
     
     private func registerBackgroundTasks() {
@@ -95,6 +113,8 @@ struct WorkoutsAppApp: App {
             print("Could not schedule app refresh: \(error)")
         }
     }
+    
+    
 }
 
 

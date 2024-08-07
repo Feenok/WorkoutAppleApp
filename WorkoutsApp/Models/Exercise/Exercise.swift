@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftData
+import CloudKit
 
 enum ExerciseCategory: String, CaseIterable, Codable, Identifiable {
     case chest
@@ -40,13 +41,22 @@ enum MuscleGroups: String, CaseIterable, Codable, Identifiable {
 
 @Model
 final class Exercise {
-    var name: String
-    var category: ExerciseCategory
+    var name: String = ""
+    var category: ExerciseCategory = ExerciseCategory.misc
     var info: String = ""
-    @Relationship(deleteRule: .cascade) var allSets: [ExerciseSet] = []
+    @Relationship(deleteRule: .cascade) var allSets: [ExerciseSet]? = []
     var PRSet: ExerciseSet? // Personal Weight Record set
+    
     var maxVolumeLoadDate: Date = Date()
     var maxVolumeLoad: Int = 0
+    
+    var maxRepDate: Date = Date()
+    var maxRepCount: Int = 0
+    
+    init(name: String, category: ExerciseCategory) {
+        self.name = name
+        self.category = category
+    }
     
     var muscleGroupTargeted: MuscleGroups {
             switch self.category {
@@ -66,7 +76,7 @@ final class Exercise {
         }
     
     func updatePRSet() { //TODO:Can make more efficient
-        PRSet = allSets.max { a, b in
+        PRSet = allSets!.max { a, b in
             if a.weight != b.weight {
                 return a.weight < b.weight
             }
@@ -110,6 +120,7 @@ final class Exercise {
         updateMaxVolumeLoad()
     }
     
+    // Gets max volume load in one day
     func updateMaxVolumeLoad() {
         guard !allSets.isEmpty else {
             maxVolumeLoad = 0
@@ -128,12 +139,26 @@ final class Exercise {
         }
     }
     
-    init(name: String, category: ExerciseCategory) {
-        self.name = name
-        self.category = category
+    // Gets max reps done in one day
+    func updateMaxRepCount() {
+        guard !allSets.isEmpty else {
+            maxRepCount = 0
+            maxRepDate = Date()
+            return
+        }
+        
+        let groupedSets = Dictionary(grouping: allSets) { Calendar.current.startOfDay(for: $0.date) }
+        let dailyReps = groupedSets.mapValues { sets in
+            sets.reduce(0) { $0 + ($1.reps) }
+        }
+        
+        if let maxDay = dailyReps.max(by: { $0.value < $1.value }) {
+            maxRepCount = maxDay.value
+            maxRepDate = maxDay.key
+        }
     }
     
-//TODO: May need to make storing/getting/updating the pr set and max volume load set more efficient. Which includes making the Exercise/ExerciseSet classes more efficient and include sorting by date
+//TODO: May need to make storing/getting/updating the pr set, max rep, max volume load set more efficient. Which includes making the Exercise/ExerciseSet classes more efficient and include sorting by date
     
 }
 

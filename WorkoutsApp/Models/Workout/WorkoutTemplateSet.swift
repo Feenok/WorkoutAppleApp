@@ -23,5 +23,6 @@ final class WorkoutTemplateSet: Identifiable {
         self.targetReps = targetReps
         self.workout = workout
     }
+
     
 }
