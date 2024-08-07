@@ -27,7 +27,7 @@ struct WorkoutDetails: View {
     @FocusState private var focusedField: UUID?
     
     var sortedSets: [WorkoutTemplateSet] {
-        workout.templateSets.sorted { $0.date < $1.date }
+        (workout.templateSets!.sorted { $0.date < $1.date })
     }
     
     private var editButton: some View {
@@ -42,7 +42,7 @@ struct WorkoutDetails: View {
     
     var body: some View {
         VStack {
-            if !workout.templateSets.isEmpty {
+            if !workout.templateSets!.isEmpty {
                     workoutList
             } else {
                 VStack {
@@ -64,7 +64,7 @@ struct WorkoutDetails: View {
             }
         }
         .navigationTitle(workout.name)
-        .navigationBarItems(trailing: !workout.templateSets.isEmpty ? editButton : nil)
+        .navigationBarItems(trailing: !workout.templateSets!.isEmpty ? editButton : nil)
         .sheet(item: $newWorkoutTemplateSet) { set in
             NavigationStack {
                 EnterWorkoutSet(workout: workout, newWorkoutTemplateSet: set)
@@ -108,7 +108,7 @@ struct WorkoutDetails: View {
         withAnimation {
             for index in offsets {
                 let setToDelete = sortedSets[index]
-                workout.templateSets.removeAll { $0.id == setToDelete.id }
+                workout.templateSets?.removeAll { $0.id == setToDelete.id }
                 modelContext.delete(setToDelete)
             }
         }
@@ -147,7 +147,7 @@ struct WorkoutDetails: View {
                 )
                 newSet.date = Date()
                 modelContext.insert(newSet)
-                workout.templateSets.append(newSet)
+                workout.templateSets?.append(newSet)
             }
             
             selectedSetIDs.removeAll()

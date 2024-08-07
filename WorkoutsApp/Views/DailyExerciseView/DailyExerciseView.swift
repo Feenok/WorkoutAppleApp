@@ -86,7 +86,7 @@ struct DailyExerciseView: View {
         let endOfDay = calendar.date(byAdding: .day, value: 1, to: startOfDay)!
         
         let allSets = allExercises.flatMap { exercise in
-            exercise.allSets.filter { set in
+            exercise.allSets!.filter { set in
                 (startOfDay...endOfDay).contains(set.date)
             }
         }

@@ -51,10 +51,10 @@ struct ExerciseDetails: View {
     
     var body: some View {
         let displayedDateStart = Calendar.current.startOfDay(for: displayedDate)
-        let hasTimedExercises = vm.exercise.allSets.contains { $0.duration != nil && $0.duration! > 0 }
+        let hasTimedExercises = (vm.exercise.allSets?.contains { $0.duration != nil && $0.duration! > 0 })!
         
         Group {
-            if !vm.exercise.allSets.isEmpty {
+            if !vm.exercise.allSets!.isEmpty {
                 ScrollView {
                     VStack () {
                         //Additional exercise info

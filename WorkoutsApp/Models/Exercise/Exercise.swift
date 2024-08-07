@@ -44,8 +44,8 @@ final class Exercise {
     var name: String = ""
     var category: ExerciseCategory = ExerciseCategory.misc
     var info: String = ""
-    @Relationship(deleteRule: .cascade) var allSets: [ExerciseSet]? = []
-    var PRSet: ExerciseSet? // Personal Weight Record set
+    @Relationship(deleteRule: .cascade, inverse: \ExerciseSet.exercise) var allSets: [ExerciseSet]? = []
+    @Relationship(deleteRule: .nullify, inverse: \ExerciseSet.isPRSetFor) var PRSet: ExerciseSet? // Personal Weight Record set
     
     var maxVolumeLoadDate: Date = Date()
     var maxVolumeLoad: Int = 0
@@ -100,11 +100,11 @@ final class Exercise {
     func addSet(_ set: ExerciseSet) {
         
         // Find the correct position to insert the new set
-        let insertIndex = allSets.lastIndex(where: { $0.date <= set.date }) ?? -1
+        let insertIndex = allSets!.lastIndex(where: { $0.date <= set.date }) ?? -1
         let insertPosition = insertIndex + 1
         
         // Update SwiftData array
-        allSets.insert(set, at: insertPosition)
+        allSets?.insert(set, at: insertPosition)
         
         updatePRSet()
         updateMaxVolumeLoad()
@@ -112,8 +112,8 @@ final class Exercise {
     
     func removeSet(_ set: ExerciseSet) {
         // Remove from allSets
-        if let index = allSets.firstIndex(where: { $0.id == set.id }) {
-            allSets.remove(at: index)
+        if let index = allSets!.firstIndex(where: { $0.id == set.id }) {
+            allSets?.remove(at: index)
         }
         
         updatePRSet()
@@ -122,13 +122,13 @@ final class Exercise {
     
     // Gets max volume load in one day
     func updateMaxVolumeLoad() {
-        guard !allSets.isEmpty else {
+        guard !allSets!.isEmpty else {
             maxVolumeLoad = 0
             maxVolumeLoadDate = Date()
             return
         }
         
-        let groupedSets = Dictionary(grouping: allSets) { Calendar.current.startOfDay(for: $0.date) }
+        let groupedSets = Dictionary(grouping: allSets!) { Calendar.current.startOfDay(for: $0.date) }
         let dailyVolumes = groupedSets.mapValues { sets in
             sets.reduce(0) { $0 + ($1.weight * $1.reps) }
         }
@@ -141,13 +141,13 @@ final class Exercise {
     
     // Gets max reps done in one day
     func updateMaxRepCount() {
-        guard !allSets.isEmpty else {
+        guard !allSets!.isEmpty else {
             maxRepCount = 0
             maxRepDate = Date()
             return
         }
         
-        let groupedSets = Dictionary(grouping: allSets) { Calendar.current.startOfDay(for: $0.date) }
+        let groupedSets = Dictionary(grouping: allSets!) { Calendar.current.startOfDay(for: $0.date) }
         let dailyReps = groupedSets.mapValues { sets in
             sets.reduce(0) { $0 + ($1.reps) }
         }

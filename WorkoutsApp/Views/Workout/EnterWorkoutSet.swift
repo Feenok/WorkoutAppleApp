@@ -124,7 +124,7 @@ struct EnterWorkoutSet: View {
                     if newWorkoutTemplateSet.name != "" && newWorkoutTemplateSet.targetWeight != 0 && newWorkoutTemplateSet.targetReps != 0 {
                         newWorkoutTemplateSet.workout = workout
                         modelContext.insert(newWorkoutTemplateSet)
-                        workout.templateSets.append(newWorkoutTemplateSet)
+                        workout.templateSets?.append(newWorkoutTemplateSet)
                         dismiss()
                     }
                 }

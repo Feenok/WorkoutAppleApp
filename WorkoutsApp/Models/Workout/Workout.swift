@@ -10,13 +10,13 @@ import SwiftData
 
 @Model
 final class Workout {
-    var name: String
-    var category: String
+    var name: String = ""
+    var category: String = ""
     var bestTimeMinutes: Int?
     var bestTimeSeconds: Int?
     var info: String = ""
     
-    @Relationship(deleteRule: .cascade) var templateSets: [WorkoutTemplateSet] = []
+    @Relationship(deleteRule: .cascade) var templateSets: [WorkoutTemplateSet]? = []
     
     
     init(name: String, category: String, bestTimeMinutes: Int? = nil, bestTimeSeconds: Int? = nil) {

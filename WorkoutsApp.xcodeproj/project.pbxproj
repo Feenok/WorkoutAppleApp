@@ -244,7 +244,6 @@
 				E9C9C4F22C40D1F1003B1119 /* Sources */,
 				E9C9C4F32C40D1F1003B1119 /* Frameworks */,
 				E9C9C4F42C40D1F1003B1119 /* Resources */,
-				E93D43FB2C617BEB00B014D9 /* Update Claude Files */,
 			);
 			buildRules = (
 			);
@@ -303,27 +302,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
-
-/* Begin PBXShellScriptBuildPhase section */
-		E93D43FB2C617BEB00B014D9 /* Update Claude Files */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "Update Claude Files";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n#!/bin/bash\n\necho \"Script is running\" > /tmp/xcode_build_script_log.txt\nenv >> /tmp/xcode_build_script_log.txt\n\n# Define source and destination directories\nSOURCE_DIR=\"${SRCROOT}/Users/ernestmargariti/Desktop/AppleApps/WorkoutsApp\"\nDEST_DIR=\"${SRCROOT}/Users/ernestmargariti/Downloads\"\n\n# Ensure the destination directory exists\nmkdir -p \"$DEST_DIR\"\n\n# Function to update a Claude file\nupdate_claude_file() {\n    local output_file=\"$DEST_DIR/$1\"\n    echo \"Updating $1...\"\n    \n    # Clear the file\n    > \"$output_file\"\n    \n    # Concatenate relevant files\n    for file in \"${@:2}\"; do\n        echo \"// File: $file\" >> \"$output_file\"\n        cat \"$SOURCE_DIR/$file\" >> \"$output_file\"\n        echo -e \"\\n\\n\" >> \"$output_file\"\n    done\n}\n\n# Update Claude files\nupdate_claude_file \"ClaudeWorkoutsAppModels.swift\" \"Workout.swift\" \"WorkoutTemplateSet.swift\" \"Exercise.swift\" \"ExerciseSet.swift\"\nupdate_claude_file \"ClaudeWorkoutsAppViews.swift\" \"ContentView.swift\" \"ExerciseList.swift\" \"EnterExercise.swift\" \"ExerciseDetails.swift\" \"FilteredExerciseList.swift\" \"ExerciseChartView.swift\" \"EditExercise.swift\" \"AdditionalDataView.swift\" \"ExerciseChartDailyView.swift\" \"WorkoutList.swift\" \"FilteredWorkoutList.swift\" \"WorkoutDetails.swift\" \"EnterWorkout.swift\" \"EnterWorkoutSet.swift\" \"EditWorkout.swift\" \"DailyExerciseView.swift\" \"DailyExerciseAdditionalData.swift\"\nupdate_claude_file \"ClaudeWorkoutsAppViewModels.swift\" \"ExerciseDetailsViewModel.swift\"\nupdate_claude_file \"ClaudeWorkoutsAppDataManagers.swift\" \"DataManager.swift\"\n\necho \"Claude files updated successfully.\"\n";
-		};
-/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		E9C9C4F22C40D1F1003B1119 /* Sources */ = {

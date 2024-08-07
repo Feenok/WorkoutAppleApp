@@ -45,7 +45,6 @@ import BackgroundTasks
 @main
 struct WorkoutsAppApp: App {
     @StateObject private var stopwatchManager = StopwatchManager()
-    @Environment(\.modelContext) private var modelContext //TODO: DELETE once testing
     
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([

@@ -11,9 +11,9 @@ import SwiftData
 @Model
 final class WorkoutTemplateSet: Identifiable {
     let id = UUID()
-    var name: String
-    var targetWeight: Int
-    var targetReps: Int
+    var name: String = ""
+    var targetWeight: Int = 0
+    var targetReps: Int = 0
     var date: Date = Date.now
     @Relationship(inverse: \Workout.templateSets) var workout: Workout?
     
